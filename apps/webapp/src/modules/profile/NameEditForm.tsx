@@ -70,10 +70,10 @@ export function NameEditForm() {
       </div>
 
       {!isEditing ? (
-        <div className="p-4 bg-gray-50 rounded-md">
+        <div className="p-4 rounded-md bg-muted dark:bg-muted/20">
           <p className="font-medium">{authState.user.name}</p>
           {authState.user.type === 'anonymous' && (
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm" style={{ color: 'var(--muted-foreground)' }}>
               You can personalize your anonymous account by changing your display name.
             </p>
           )}
@@ -81,7 +81,11 @@ export function NameEditForm() {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium"
+              style={{ color: 'var(--muted-foreground)' }}
+            >
               Display Name
             </label>
             <input
@@ -89,23 +93,50 @@ export function NameEditForm() {
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className={`mt-1 block w-full px-3 py-2 border ${
-                error ? 'border-red-300' : 'border-gray-300'
-              } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
+              className={`mt-1 block w-full px-3 py-2 rounded-md shadow-sm focus:outline-none ${
+                error
+                  ? 'focus:ring-error-text focus:border-error-text'
+                  : 'focus:ring-input-focus-ring focus:border-input-focus-ring'
+              }`}
+              style={{
+                backgroundColor: 'var(--input)',
+                border: `1px solid ${error ? 'var(--input-border-error)' : 'var(--input-border)'}`,
+                color: 'var(--foreground)',
+              }}
               placeholder="Enter your display name"
               disabled={isLoading}
             />
-            {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-            <p className="mt-1 text-sm text-gray-500">
+            {error && (
+              <p className="mt-1 text-sm" style={{ color: 'var(--error-text)' }}>
+                {error}
+              </p>
+            )}
+            <p className="mt-1 text-sm" style={{ color: 'var(--muted-foreground)' }}>
               Your name must be between 3 and 30 characters.
             </p>
           </div>
 
           <div className="flex space-x-2 justify-end">
-            <Button type="button" variant="ghost" onClick={handleCancel} disabled={isLoading}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleCancel}
+              disabled={isLoading}
+              style={{
+                backgroundColor: 'var(--muted)',
+                color: 'var(--muted-foreground)',
+              }}
+            >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              style={{
+                backgroundColor: 'var(--primary)',
+                color: 'var(--primary-foreground)',
+              }}
+            >
               {isLoading ? 'Saving...' : 'Save Name'}
             </Button>
           </div>

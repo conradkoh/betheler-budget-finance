@@ -129,9 +129,16 @@ export function LoginCodeGenerator() {
 
   return (
     <div className="w-full border rounded-lg overflow-hidden">
-      <div className="p-6 border-b">
+      <div
+        className="p-6 border-b"
+        style={{
+          backgroundColor: 'var(--card)',
+          color: 'var(--card-foreground)',
+          borderColor: 'var(--border)',
+        }}
+      >
         <h3 className="text-lg font-semibold">Use Your Account on Another Device</h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
           Generate a temporary login code to access your anonymous account from another device
         </p>
       </div>
@@ -139,22 +146,38 @@ export function LoginCodeGenerator() {
       <div className="p-6">
         {loginCode ? (
           <div className="space-y-4">
-            <div className="p-4 bg-gray-50 rounded-lg text-center">
-              <p className="text-sm text-gray-500 mb-1">Your login code:</p>
-              <p className="text-3xl font-mono font-bold tracking-wider" aria-live="polite">
+            <div
+              className="p-4 rounded-lg text-center"
+              style={{
+                backgroundColor: 'var(--muted)',
+                color: 'var(--muted-foreground)',
+              }}
+            >
+              <p className="text-sm mb-1" style={{ color: 'var(--muted-foreground)' }}>
+                Your login code:
+              </p>
+              <p
+                className="text-3xl font-mono font-bold tracking-wider"
+                style={{ color: 'var(--foreground)' }}
+                aria-live="polite"
+              >
                 {formatLoginCode(loginCode)}
               </p>
-              <p className="text-sm text-gray-500 mt-2" aria-live="polite">
+              <p
+                className="text-sm mt-2"
+                style={{ color: 'var(--muted-foreground)' }}
+                aria-live="polite"
+              >
                 Valid for {timeRemaining}
               </p>
             </div>
 
-            <div className="text-sm text-gray-600">
+            <div className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
               <p>Enter this code on the login page of your other device to access your account.</p>
             </div>
           </div>
         ) : (
-          <div className="text-gray-600 text-sm space-y-2">
+          <div className="text-sm space-y-2" style={{ color: 'var(--muted-foreground)' }}>
             <p>
               Generate a temporary login code that allows you to access your anonymous account from
               another device. The code will be valid for 1 minute.
@@ -166,7 +189,13 @@ export function LoginCodeGenerator() {
         )}
       </div>
 
-      <div className="p-4 bg-gray-50 border-t flex justify-end">
+      <div
+        className="p-4 flex justify-end"
+        style={{
+          backgroundColor: 'var(--muted)',
+          borderColor: 'var(--border)',
+        }}
+      >
         <Button
           onClick={handleGenerateCode}
           disabled={isGenerating}
