@@ -17,6 +17,7 @@ import {
   FormMessage,
 } from './ui/form';
 import { Input } from './ui/input';
+import { NumberInput } from './ui/number-input';
 
 interface BudgetFormProps {
   onSuccess?: () => void;
@@ -62,6 +63,13 @@ export function BudgetForm({ onSuccess, className, year, month, initialData }: B
         if (!amount) {
           form.setError('amount', {
             message: 'Please enter a valid amount',
+          });
+          return;
+        }
+
+        if (amount <= 0) {
+          form.setError('amount', {
+            message: 'Budget amount must be greater than zero',
           });
           return;
         }
@@ -158,11 +166,12 @@ export function BudgetForm({ onSuccess, className, year, month, initialData }: B
               <FormItem>
                 <FormLabel className="text-sm font-medium">Budget Amount</FormLabel>
                 <FormControl>
-                  <Input
+                  <NumberInput
                     {...field}
                     placeholder="0.00"
-                    inputMode="decimal"
                     className="text-base sm:text-sm"
+                    prefix="$"
+                    allowNegative={false}
                   />
                 </FormControl>
                 <FormDescription className="text-xs">

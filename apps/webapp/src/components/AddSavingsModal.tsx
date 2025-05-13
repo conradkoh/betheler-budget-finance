@@ -14,6 +14,7 @@ import {
 } from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import { NumberInput } from './ui/number-input';
 
 interface AddSavingsModalProps {
   isOpen: boolean;
@@ -47,10 +48,17 @@ export function AddSavingsModal({
 
     const parsedAmount = parseCurrencyInput(amount);
 
-    if (!parsedAmount || parsedAmount <= 0) {
-      toast.error('Please enter a valid amount greater than zero.');
+    if (!parsedAmount) {
+      toast.error('Please enter a valid amount.');
       return;
     }
+
+    if (parsedAmount === 0) {
+      toast.error('Amount cannot be zero.');
+      return;
+    }
+
+    const action = parsedAmount > 0 ? 'deposit to' : 'withdrawal from';
 
     setIsSubmitting(true);
 
@@ -63,7 +71,9 @@ export function AddSavingsModal({
         transactionType: 'savings',
       });
 
-      toast.success(`Successfully added ${formatCurrency(parsedAmount)} to your savings.`);
+      toast.success(
+        `Successfully added ${formatCurrency(Math.abs(parsedAmount))} ${action} your savings.`
+      );
 
       onSuccess?.();
       handleClose();
@@ -95,21 +105,16 @@ export function AddSavingsModal({
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="amount">Amount</Label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                $
-              </span>
-              <Input
-                id="amount"
-                inputMode="decimal"
-                placeholder="0.00"
-                className="pl-8"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                required
-                autoFocus
-              />
-            </div>
+            <NumberInput
+              id="amount"
+              placeholder="0.00"
+              value={amount}
+              onChange={setAmount}
+              required
+              autoFocus
+              prefix="$"
+              allowNegative={true}
+            />
           </div>
 
           <div className="space-y-2">

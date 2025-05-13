@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from './ui/form';
 import { Input } from './ui/input';
+import { NumberInput } from './ui/number-input';
 
 interface TransactionFormProps {
   onSuccess?: () => void;
@@ -62,6 +63,13 @@ export function TransactionForm({
     } else if (transactionType === 'savings') {
       form.setValue('category', 'Savings');
     }
+
+    // Handle negative values when switching transaction types
+    const currentAmount = parseCurrencyInput(form.getValues().amount);
+    if (currentAmount && currentAmount < 0 && transactionType !== 'savings') {
+      // Convert negative to positive when switching to a type that doesn't support negative values
+      form.setValue('amount', String(Math.abs(currentAmount)));
+    }
   }, [transactionType, form]);
 
   const onSubmit = useCallback(
@@ -76,6 +84,23 @@ export function TransactionForm({
           });
           return;
         }
+
+        // Validate amount based on transaction type
+        if (data.transactionType === 'expense' && amount < 0) {
+          form.setError('amount', {
+            message: 'Expense amount must be positive',
+          });
+          return;
+        }
+
+        if (data.transactionType === 'income' && amount < 0) {
+          form.setError('amount', {
+            message: 'Income amount must be positive',
+          });
+          return;
+        }
+
+        // Savings can be positive (deposits) or negative (withdrawals)
 
         let category = data.category;
         if (data.transactionType === 'income') {
@@ -131,11 +156,12 @@ export function TransactionForm({
             <FormItem>
               <FormLabel className="text-sm font-medium">Amount</FormLabel>
               <FormControl>
-                <Input
+                <NumberInput
                   {...field}
                   placeholder="0.00"
-                  inputMode="decimal"
                   className="text-base sm:text-sm"
+                  prefix="$"
+                  allowNegative={transactionType === 'savings'}
                 />
               </FormControl>
               <FormDescription className="text-xs">
