@@ -16,13 +16,6 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-export const viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-  themeColor: '#ffffff',
-};
-
 export const metadata: Metadata = {
   title: 'Budget',
   description: 'Budgeting and financial management application for Bethel ER',
