@@ -23,7 +23,14 @@ type PresentationContextType = {
   goToSlide: (index: number) => void;
   controlsVisible: boolean;
   isSynced: boolean;
-  toggleSyncMode: () => void;
+  isPresenter: boolean;
+  isPresentationActive: boolean;
+  isFollowing: boolean;
+  isSoloMode: boolean;
+  sessionId: string;
+  startPresenting: () => void;
+  stopPresenting: () => void;
+  followPresenter: () => void;
 };
 
 const PresentationContext = createContext<PresentationContextType | null>(null);
@@ -40,7 +47,7 @@ interface PresentationContainerProps {
   children: React.ReactNode;
   totalSlides: number;
   className?: string;
-  presentationKey?: string;
+  presentationKey: string;
   fallback?: React.ReactNode;
 }
 
@@ -81,17 +88,22 @@ function PresentationContainerInner({
     nextSlide: nextSlideSync,
     previousSlide: previousSlideSync,
     goToSlide: goToSlideSync,
-    isSyncEnabled,
-    toggleSyncMode,
+    isPresenter,
+    isPresentationActive,
+    isFollowing,
+    isSoloMode,
+    sessionId,
+    startPresenting,
+    stopPresenting,
+    followPresenter,
   } = usePresentationSync({
-    key: presentationKey || '',
+    key: presentationKey,
     initialSlide: !Number.isNaN(initialSlide) ? initialSlide : 1,
     totalSlides,
-    enabled: !!presentationKey,
   });
 
-  // Use isSyncEnabled from the hook which reads from URL
-  const isSynced = isSyncEnabled && !!presentationKey;
+  // Sync is always enabled since presentationKey is mandatory
+  const isSynced = true;
 
   // Handle fullscreen changes from outside (e.g., Escape key)
   useEffect(() => {
@@ -170,6 +182,25 @@ function PresentationContainerInner({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Check if the event originated from an input field
+      const target = e.target as HTMLElement;
+      const isTextInput =
+        target instanceof HTMLTextAreaElement ||
+        (target instanceof HTMLInputElement && (!target.type || target.type === 'text')) ||
+        target.isContentEditable;
+
+      // If we're in a text input and modifier keys are pressed,
+      // let the browser handle text editing shortcuts
+      if (isTextInput && (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey)) {
+        return;
+      }
+
+      // If we're in a text input with no modifiers, don't navigate
+      if (isTextInput) {
+        return;
+      }
+
+      // Handle navigation shortcuts when not in text input
       if (e.key === 'ArrowRight' || e.key === ' ') {
         nextSlide();
       } else if (e.key === 'ArrowLeft') {
@@ -195,12 +226,19 @@ function PresentationContainerInner({
         goToSlide,
         controlsVisible,
         isSynced,
-        toggleSyncMode,
+        isPresenter,
+        isPresentationActive,
+        isFollowing,
+        isSoloMode,
+        sessionId,
+        startPresenting,
+        stopPresenting,
+        followPresenter,
       }}
     >
       <div
         className={cn(
-          'relative min-h-screen bg-background text-foreground',
+          'grow bg-background text-foreground flex flex-col justify-center pb-20',
           isFullScreen && 'fixed inset-0 z-50',
           className
         )}

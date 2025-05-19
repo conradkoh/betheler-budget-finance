@@ -18,7 +18,7 @@ export default function MyPresentation() {
     <PresentationContainer totalSlides={5} presentationKey={presentationKey}>
       <PresentationControls />
       
-      <Slide index={1} className="text-center bg-gradient-to-b from-background to-slate-100">
+      <Slide index={1} className="text-center">
         <h1 className="text-6xl font-bold">Title Slide</h1>
       </Slide>
       

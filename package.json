@@ -5,13 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nx run-many --target=dev --projects=webapp,@workspace/backend --parallel",
+    "dev": "nx run-many --target=dev --projects=@workspace/webapp,@workspace/backend --parallel",
     "setup": "node scripts/setup.js",
     "lint": "biome check .",
     "lint:fix": "biome check --apply .",
     "format": "biome format .",
     "format:fix": "biome format --write .",
-    "typecheck": "pnpm --filter @workspace/webapp --filter @workspace/backend run typecheck",
+    "typecheck": "nx run-many --target=typecheck --projects=@workspace/webapp,@workspace/backend",
     "prepare": "husky"
   },
   "lint-staged": {
