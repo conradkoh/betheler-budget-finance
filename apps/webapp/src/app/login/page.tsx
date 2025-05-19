@@ -43,7 +43,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold">Welcome Back</h1>
-          <p className="text-sm text-gray-500">Choose a login method to continue</p>
+          <p className="text-sm text-muted-foreground">Choose a login method to continue</p>
         </div>
 
         <div className="space-y-4">
@@ -51,7 +51,7 @@ export default function LoginPage() {
             <div className="space-y-4">
               <div className="text-center mb-2">
                 <h3 className="text-lg font-semibold">Login with Code</h3>
-                <p className="text-sm text-gray-500">Use a code from your other device</p>
+                <p className="text-sm text-muted-foreground">Use a code from your other device</p>
               </div>
               <Link href="/login/code">
                 <Button className="w-full" aria-label="Go to login with code page">
@@ -72,7 +72,7 @@ export default function LoginPage() {
           <div className="pt-6 text-center">
             <Link
               href="/recover"
-              className="inline-flex items-center text-xs text-gray-500 hover:text-gray-700 transition-colors"
+              className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Recover your anonymous account"
             >
               <KeySquare className="mr-1 h-3 w-3" aria-hidden="true" />

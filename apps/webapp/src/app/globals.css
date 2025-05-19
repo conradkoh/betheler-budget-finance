@@ -44,6 +44,49 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* Add smooth transitions for theme changes */
+:root {
+  --theme-transition-duration: 0.2s;
+  --theme-transition-ease: ease;
+}
+
+/* Apply transitions to HTML element for theme changes */
+html {
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-ease);
+}
+
+/* Apply transitions to specific elements that change with theme */
+body,
+div,
+nav,
+aside,
+main,
+button,
+input,
+select,
+textarea {
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-ease), color
+    var(--theme-transition-duration) var(--theme-transition-ease), border-color
+    var(--theme-transition-duration) var(--theme-transition-ease), box-shadow
+    var(--theme-transition-duration) var(--theme-transition-ease);
+}
+
+/* Disable transitions when user has reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body,
+  div,
+  nav,
+  aside,
+  main,
+  button,
+  input,
+  select,
+  textarea {
+    transition: none !important;
+  }
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);

@@ -42,7 +42,7 @@ export default function LoginCodePage() {
       <Card className="w-full max-w-md p-6 space-y-6">
         <div className="text-center">
           <h1 className="text-2xl font-bold tracking-tight">Login with Code</h1>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-muted-foreground">
             Enter the code from your other device to access your account
           </p>
         </div>

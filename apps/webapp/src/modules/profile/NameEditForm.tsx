@@ -70,10 +70,10 @@ export function NameEditForm() {
       </div>
 
       {!isEditing ? (
-        <div className="p-4 bg-gray-50 rounded-md">
+        <div className="p-4 bg-secondary/50 rounded-md">
           <p className="font-medium">{authState.user.name}</p>
           {authState.user.type === 'anonymous' && (
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-muted-foreground">
               You can personalize your anonymous account by changing your display name.
             </p>
           )}
@@ -81,7 +81,7 @@ export function NameEditForm() {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="name" className="block text-sm font-medium">
               Display Name
             </label>
             <input
@@ -90,13 +90,13 @@ export function NameEditForm() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className={`mt-1 block w-full px-3 py-2 border ${
-                error ? 'border-red-300' : 'border-gray-300'
-              } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500`}
+                error ? 'border-destructive' : 'border-input'
+              } rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring`}
               placeholder="Enter your display name"
               disabled={isLoading}
             />
-            {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-            <p className="mt-1 text-sm text-gray-500">
+            {error && <p className="mt-1 text-sm text-destructive">{error}</p>}
+            <p className="mt-1 text-sm text-muted-foreground">
               Your name must be between 3 and 30 characters.
             </p>
           </div>

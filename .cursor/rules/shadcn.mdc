@@ -7,4 +7,4 @@ alwaysApply: true
 # Shadcn
 
 - When adding a new component, use the command format `npx shadcn@latest add <component-name>`
-- Run the command from within @workspace/webapp
+- Run the command from within the webapp folder at apps/webapp

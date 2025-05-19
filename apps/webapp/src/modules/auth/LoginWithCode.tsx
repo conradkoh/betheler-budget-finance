@@ -96,7 +96,7 @@ export function LoginWithCode() {
             aria-invalid={error ? true : undefined}
           />
           {error && (
-            <p id="code-error" className="mt-1 text-sm text-red-600" role="alert">
+            <p id="code-error" className="mt-1 text-sm text-destructive" role="alert">
               {error}
             </p>
           )}
@@ -114,12 +114,12 @@ export function LoginWithCode() {
     <div className="space-y-4">
       <div className="text-center mb-6">
         <h3 className="text-lg font-semibold">Login with Code</h3>
-        <p className="text-sm text-gray-500">Enter the login code from your other device</p>
+        <p className="text-sm text-muted-foreground">Enter the login code from your other device</p>
       </div>
 
       {formContent}
 
-      <p className="text-xs text-gray-500 text-center">
+      <p className="text-xs text-muted-foreground text-center">
         The login code is case-insensitive and valid for 1 minute after generation
       </p>
     </div>

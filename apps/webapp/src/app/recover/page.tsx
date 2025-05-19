@@ -74,7 +74,7 @@ function RecoverAccountForm() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4">
+    <div className="flex items-center justify-center min-h-screen bg-background p-4">
       <div className="w-full max-w-md">
         <Card className="shadow-lg">
           <CardHeader className="pb-6">
@@ -114,7 +114,7 @@ function RecoverAccountForm() {
               </Button>
               <Link
                 href="/login"
-                className="flex items-center justify-center text-sm text-gray-500 hover:text-gray-700 transition-colors mt-4 pt-2"
+                className="flex items-center justify-center text-sm text-muted-foreground hover:text-foreground transition-colors mt-4 pt-2"
               >
                 <ArrowLeft className="mr-1 h-3 w-3" />
                 Back to Login

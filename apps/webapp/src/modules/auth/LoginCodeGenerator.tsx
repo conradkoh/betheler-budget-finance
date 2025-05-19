@@ -131,7 +131,7 @@ export function LoginCodeGenerator() {
     <div className="w-full border rounded-lg overflow-hidden">
       <div className="p-6 border-b">
         <h3 className="text-lg font-semibold">Use Your Account on Another Device</h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           Generate a temporary login code to access your anonymous account from another device
         </p>
       </div>
@@ -139,22 +139,22 @@ export function LoginCodeGenerator() {
       <div className="p-6">
         {loginCode ? (
           <div className="space-y-4">
-            <div className="p-4 bg-gray-50 rounded-lg text-center">
-              <p className="text-sm text-gray-500 mb-1">Your login code:</p>
+            <div className="p-4 bg-secondary/50 rounded-lg text-center">
+              <p className="text-sm text-muted-foreground mb-1">Your login code:</p>
               <p className="text-3xl font-mono font-bold tracking-wider" aria-live="polite">
                 {formatLoginCode(loginCode)}
               </p>
-              <p className="text-sm text-gray-500 mt-2" aria-live="polite">
+              <p className="text-sm text-muted-foreground mt-2" aria-live="polite">
                 Valid for {timeRemaining}
               </p>
             </div>
 
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-muted-foreground">
               <p>Enter this code on the login page of your other device to access your account.</p>
             </div>
           </div>
         ) : (
-          <div className="text-gray-600 text-sm space-y-2">
+          <div className="text-muted-foreground text-sm space-y-2">
             <p>
               Generate a temporary login code that allows you to access your anonymous account from
               another device. The code will be valid for 1 minute.
@@ -166,7 +166,7 @@ export function LoginCodeGenerator() {
         )}
       </div>
 
-      <div className="p-4 bg-gray-50 border-t flex justify-end">
+      <div className="p-4 bg-secondary/50 border-t flex justify-end">
         <Button
           onClick={handleGenerateCode}
           disabled={isGenerating}

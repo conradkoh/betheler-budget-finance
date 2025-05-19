@@ -91,7 +91,7 @@ export function UserMenu({ className, alignMenu = 'end', showNameOnMobile = true
             <AlertDialogAction
               onClick={handleLogout}
               disabled={isLoggingOut}
-              className="bg-red-600 text-white hover:bg-red-700"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isLoggingOut ? 'Logging out...' : 'Log out'}
             </AlertDialogAction>
@@ -137,7 +137,7 @@ export function UserMenu({ className, alignMenu = 'end', showNameOnMobile = true
 
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            className="cursor-pointer py-2 text-red-600 focus:text-red-600 focus:bg-red-50 flex items-center gap-2"
+            className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 flex items-center gap-2"
             onClick={() => setShowLogoutConfirm(true)}
             disabled={isLoggingOut}
           >

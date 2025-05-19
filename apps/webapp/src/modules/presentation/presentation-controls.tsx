@@ -393,7 +393,9 @@ export function PresentationControls() {
               <section>
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-medium">Sync Status</h3>
-                  <span className="text-xs font-medium text-green-500">Connected</span>
+                  <span className="text-xs font-medium text-green-600 dark:text-green-400">
+                    Connected
+                  </span>
                 </div>
 
                 {/* Sync Controls - Only shown when sync is enabled */}

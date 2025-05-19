@@ -12,17 +12,17 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuthState } from '@/modules/auth/AuthProvider';
 import { LoginCodeGenerator } from '@/modules/auth/LoginCodeGenerator';
 import { NameEditForm } from '@/modules/profile/NameEditForm';
+import { ThemeSettings } from '@/modules/theme/ThemeSettings';
 import { api } from '@workspace/backend/convex/_generated/api';
 import { useSessionId } from 'convex-helpers/react/sessions';
 import { useAction } from 'convex/react';
 import { CopyIcon, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 // Recovery Code Component
@@ -106,7 +106,7 @@ function RecoveryCodeSection() {
   return (
     <div className="border-t pt-6">
       <h2 className="text-xl font-semibold mb-2">Account Recovery</h2>
-      <p className="text-sm text-gray-500 mb-4">
+      <p className="text-sm text-muted-foreground mb-4">
         Keep this recovery code in a safe place. It's the only way to regain access to your
         anonymous account if you lose access.
       </p>
@@ -155,7 +155,7 @@ function RecoveryCodeSection() {
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
                   Regenerating your recovery code will{' '}
-                  <span className="font-bold text-red-500">invalidate your old code</span>. This
+                  <span className="font-bold text-destructive">invalidate your old code</span>. This
                   action cannot be undone. Your old recovery code will no longer work!
                   <br />
                   <br />
@@ -166,7 +166,7 @@ function RecoveryCodeSection() {
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleRegenerateCode}
-                  className="bg-red-500 hover:bg-red-600"
+                  className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                 >
                   Regenerate
                 </AlertDialogAction>
@@ -175,7 +175,7 @@ function RecoveryCodeSection() {
           </AlertDialog>
         </div>
       )}
-      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+      {error && <p className="text-destructive text-sm mt-2">{error}</p>}
     </div>
   );
 }
@@ -183,70 +183,39 @@ function RecoveryCodeSection() {
 export default function ProfilePage() {
   const authState = useAuthState();
 
-  // Check if user is authenticated
-  const isAuthenticated = useMemo(() => authState?.state === 'authenticated', [authState]);
-
-  // Check if user is anonymous
-  const isAnonymousUser = useMemo(
-    () =>
-      isAuthenticated && authState && 'user' in authState && authState.user.type === 'anonymous',
-    [authState, isAuthenticated]
-  );
+  if (authState?.state !== 'authenticated' || !authState?.user) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full p-4">
+        <h1 className="text-xl font-semibold mb-2">Profile</h1>
+        <p className="text-sm text-muted-foreground">
+          You need to be logged in to view your profile.
+        </p>
+        <Link href="/login" className="mt-4">
+          <Button>Log In</Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        <Card className="p-6 mb-6">
-          <h1 className="text-2xl font-bold mb-6">Your Profile</h1>
+    <div className="container max-w-2xl mx-auto p-4 space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold mb-2">Profile</h1>
+        <p className="text-sm text-muted-foreground mb-6">
+          Manage your account information and preferences.
+        </p>
 
-          {isAuthenticated && (
-            <div className="space-y-8">
-              <div className="p-4 bg-gray-50 rounded-md">
-                <h2 className="text-xl font-semibold mb-2">Account Information</h2>
-                <div className="grid grid-cols-1 gap-2">
-                  <div>
-                    <span className="font-medium">Account Type:</span>{' '}
-                    {isAnonymousUser ? (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        Anonymous
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Full Account
-                      </span>
-                    )}
-                  </div>
-                  {isAnonymousUser && (
-                    <div className="mt-2 text-sm text-gray-500">
-                      You are using an anonymous account. Your data will be available as long as you
-                      use the same device and don't clear your browser data.
-                    </div>
-                  )}
-                </div>
-              </div>
+        <div className="border-t pt-6">
+          <h2 className="text-xl font-semibold mb-2">Account Information</h2>
+          <div className="space-y-4">
+            <NameEditForm />
+            <LoginCodeGenerator />
+          </div>
+        </div>
 
-              <div className="border-t pt-6">
-                <NameEditForm />
-              </div>
+        <ThemeSettings />
 
-              {isAnonymousUser && (
-                <div className="border-t pt-6">
-                  <LoginCodeGenerator />
-                </div>
-              )}
-
-              {isAnonymousUser && <RecoveryCodeSection />}
-
-              <div className="border-t pt-6 flex justify-end">
-                <Link href="/app">
-                  <Button variant="outline" aria-label="Return to app">
-                    Back to App
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          )}
-        </Card>
+        <RecoveryCodeSection />
       </div>
     </div>
   );
