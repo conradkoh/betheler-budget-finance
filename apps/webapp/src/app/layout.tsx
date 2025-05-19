@@ -118,7 +118,7 @@ export default function RootLayout({
         <ConvexClientProvider>
           <AuthProvider>
             <ThemeProvider>
-              <div className="flex flex-col max-h-screen overflow-hidden">
+              <div className="flex flex-col h-screen overflow-hidden">
                 <Navigation />
                 <main className="flex-1 flex flex-col overflow-scroll">{children}</main>
               </div>
