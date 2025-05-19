@@ -68,18 +68,24 @@ html {
 }
 
 /* Apply transitions to specific elements that change with theme */
-body,
-div,
-nav,
-aside,
-main,
+body {
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-ease), color
+    var(--theme-transition-duration) var(--theme-transition-ease);
+}
+
+/* Only apply transitions to direct children of body to reduce performance impact */
+body > * {
+  transition: background-color var(--theme-transition-duration) var(--theme-transition-ease), color
+    var(--theme-transition-duration) var(--theme-transition-ease);
+}
+
+/* Specific elements that need border/shadow transitions */
 button,
 input,
-select,
-textarea {
-  transition: background-color var(--theme-transition-duration) var(--theme-transition-ease), color
-    var(--theme-transition-duration) var(--theme-transition-ease), border-color
-    var(--theme-transition-duration) var(--theme-transition-ease), box-shadow
+.card,
+.border,
+[class*="border-"] {
+  transition: border-color var(--theme-transition-duration) var(--theme-transition-ease), box-shadow
     var(--theme-transition-duration) var(--theme-transition-ease);
 }
 
