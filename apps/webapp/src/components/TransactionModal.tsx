@@ -20,10 +20,10 @@ interface TransactionModalProps {
   onSuccess?: () => void;
 
   /**
-   * Button label text
+   * Button label text or React node
    * @default "Add Transaction"
    */
-  buttonLabel?: string;
+  buttonLabel?: React.ReactNode;
 
   /**
    * Button variant

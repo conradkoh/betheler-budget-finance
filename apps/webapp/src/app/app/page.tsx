@@ -6,6 +6,7 @@ import { TransactionModal } from '@/components/TransactionModal';
 import { Button } from '@/components/ui/button';
 import { useAuthState } from '@/modules/auth/AuthProvider';
 import { RequireLogin } from '@/modules/auth/RequireLogin';
+import { LayoutGrid, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -28,17 +29,17 @@ export default function AppPage() {
           <div className="mb-6 sm:mb-8">
             <div className="flex justify-between items-center">
               <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
-              <div className="flex gap-2">
-                <TransactionModal
-                  buttonLabel="Add Transaction"
-                  onSuccess={handleTransactionAdded}
-                />
-                <Link href="/app/profile">
-                  <Button variant="outline" size="sm">
-                    View Profile
-                  </Button>
-                </Link>
-              </div>
+              <TransactionModal
+                buttonLabel={
+                  <>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Transaction
+                  </>
+                }
+                buttonVariant="default"
+                className="font-medium shadow-sm hover:shadow-md transition-shadow"
+                onSuccess={handleTransactionAdded}
+              />
             </div>
           </div>
 
@@ -76,12 +77,18 @@ export default function AppPage() {
                   <div className="space-y-2">
                     <TransactionModal
                       buttonVariant="outline"
-                      buttonLabel="Add New Transaction"
+                      buttonLabel={
+                        <>
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add New Transaction
+                        </>
+                      }
                       className="w-full justify-start"
                       onSuccess={handleTransactionAdded}
                     />
                     <Link href="/budgets" className="block">
                       <Button variant="outline" size="sm" className="w-full justify-start">
+                        <LayoutGrid className="h-4 w-4 mr-2" />
                         Manage Budgets
                       </Button>
                     </Link>
