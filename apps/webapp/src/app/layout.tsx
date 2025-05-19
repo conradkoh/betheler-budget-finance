@@ -6,6 +6,7 @@ import { Navigation } from '@/components/Navigation';
 import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider } from '@/modules/auth/AuthProvider';
 import { ThemeProvider } from '@/modules/theme/ThemeProvider';
+import type { Theme } from '@/modules/theme/theme-utils';
 import Script from 'next/script';
 
 const geistSans = Geist({
@@ -41,31 +42,58 @@ export const metadata: Metadata = {
 
 // Minimal script for theme flash prevention
 const themeScript = `
-  (function() {
-    try {
-      // Get stored theme or use system preference
-      const storedTheme = localStorage.getItem('theme');
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      const theme = storedTheme === 'system' ? systemTheme : storedTheme || systemTheme;
-      
-      // Apply theme immediately before any rendering
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
+(() => {
+  window.__theme = {
+    value: localStorage.getItem('theme') || 'system',
+    onThemeChange: () => {
+      const theme = window.__theme.value;
+      let nextTheme = theme;
+      // we interpret system theme to be the actual theme value for the transition
+      if (nextTheme === 'system') {
+        nextTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light';
       }
-      
-      // Set background color based on theme to avoid white flash
-      document.documentElement.style.backgroundColor = 
-        theme === 'dark' ? 'rgb(9, 9, 11)' : 'rgb(255, 255, 255)';
-    } catch (e) {
-      // Fallback to system preference if localStorage is not available
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.classList.add('dark');
-        document.documentElement.style.backgroundColor = 'rgb(9, 9, 11)';
+      switch (nextTheme) {
+        case 'dark': {
+          document.documentElement.classList.add('dark');
+          document.documentElement.style.backgroundColor = 'var(--background)';
+          break;
+        }
+        case 'light': {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.style.backgroundColor = 'var(--background)';
+          break;
+        }
       }
-    }
-  })();
+    },
+    /**
+     * @param {'light' | 'dark' | 'system'} theme - The theme to set.
+     * @description Sets the theme and updates the document background color.
+     */
+    setTheme: (theme) => {
+      if (theme == null) {
+        return;
+      }
+      // set the window values and persist
+      window.__theme.value = theme;
+      localStorage.setItem('theme', theme);
+
+      // trigger the update
+      window.__theme.onThemeChange();
+    },
+    init: () => {
+      const theme = window.__theme.value;
+      window.__theme.setTheme(theme);
+    },
+  };
+
+  window.__theme.init(); //trigger the initial theme
+
+  // listen to updates from the system
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  mediaQuery.addEventListener('change', window.__theme.onThemeChange);
+})();
 `;
 
 export default function RootLayout({
@@ -101,4 +129,14 @@ export default function RootLayout({
       </body>
     </html>
   );
+}
+
+declare global {
+  interface Window {
+    __theme: {
+      value: Theme;
+      onThemeChange: () => void;
+      setTheme: (theme: Theme) => void;
+    };
+  }
 }
