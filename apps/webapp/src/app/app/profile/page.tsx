@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { DarkModeToggle } from '@/components/ui/darkMode';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuthState } from '@/modules/auth/AuthProvider';
 import { LoginCodeGenerator } from '@/modules/auth/LoginCodeGenerator';
@@ -106,7 +107,7 @@ function RecoveryCodeSection() {
   return (
     <div className="border-t pt-6">
       <h2 className="text-xl font-semibold mb-2">Account Recovery</h2>
-      <p className="text-sm text-gray-500 mb-4">
+      <p className="text-sm mb-4" style={{ color: 'var(--muted-text)' }}>
         Keep this recovery code in a safe place. It's the only way to regain access to your
         anonymous account if you lose access.
       </p>
@@ -196,22 +197,37 @@ export default function ProfilePage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
+        <div className="flex justify-end mb-6">
+          <DarkModeToggle />
+        </div>
         <Card className="p-6 mb-6">
           <h1 className="text-2xl font-bold mb-6">Your Profile</h1>
 
           {isAuthenticated && (
             <div className="space-y-8">
-              <div className="p-4 bg-gray-50 rounded-md">
+              <div className="p-4 rounded-md bg-muted dark:bg-muted/20">
                 <h2 className="text-xl font-semibold mb-2">Account Information</h2>
                 <div className="grid grid-cols-1 gap-2">
                   <div>
-                    <span className="font-medium">Account Type:</span>{' '}
+                    <span className="font-medium">Account Type:</span>
                     {isAnonymousUser ? (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      <span
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                        style={{
+                          backgroundColor: 'var(--badge-anonymous-bg)',
+                          color: 'var(--badge-anonymous-text)',
+                        }}
+                      >
                         Anonymous
                       </span>
                     ) : (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <span
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                        style={{
+                          backgroundColor: 'var(--badge-full-bg)',
+                          color: 'var(--badge-full-text)',
+                        }}
+                      >
                         Full Account
                       </span>
                     )}

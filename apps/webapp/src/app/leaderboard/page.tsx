@@ -2,6 +2,7 @@
 
 import { MonthYearPicker } from '@/components/MonthYearPicker';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { DarkModeToggle } from '@/components/ui/darkMode';
 import { useAuthState } from '@/modules/auth/AuthProvider';
 import { api } from '@workspace/backend/convex/_generated/api';
 import { useQuery } from 'convex/react';
@@ -30,13 +31,13 @@ export default function LeaderboardPage() {
   const getMedalColor = (position: number) => {
     switch (position) {
       case 0:
-        return 'text-yellow-500'; // Gold
+        return 'var(--medal-gold)'; // Gold
       case 1:
-        return 'text-gray-400'; // Silver
+        return 'var(--medal-silver)'; // Silver
       case 2:
-        return 'text-amber-700'; // Bronze
+        return 'var(--medal-bronze)'; // Bronze
       default:
-        return 'text-gray-300'; // Other positions
+        return 'var(--medal-other)'; // Other positions
     }
   };
 
@@ -45,7 +46,7 @@ export default function LeaderboardPage() {
       <div className="max-w-5xl mx-auto">
         <div className="mb-6 sm:mb-8 text-center">
           <h1 className="text-2xl sm:text-3xl font-bold mb-2 flex items-center justify-center">
-            <Trophy className="h-8 w-8 text-yellow-500 mr-2" />
+            <Trophy className="h-8 w-8" style={{ color: 'var(--medal-gold)' }} />
             Transaction Leaderboard <span className="ml-2">👑</span>
           </h1>
           <p className="text-muted-foreground mb-6">
@@ -58,7 +59,7 @@ export default function LeaderboardPage() {
           </div>
         </div>
 
-        <Card className="shadow-md border-t-4 border-t-yellow-500">
+        <Card className="shadow-md" style={{ borderTopColor: 'var(--medal-gold)' }}>
           <CardHeader className="bg-muted/30">
             <CardTitle className="flex flex-col sm:flex-row items-center justify-center text-xl">
               <div className="flex items-center">
@@ -86,18 +87,20 @@ export default function LeaderboardPage() {
                           className={`grid grid-cols-[auto_1fr] sm:grid-cols-[auto_1fr_minmax(90px,auto)] 
                                      grid-rows-[auto_auto] sm:grid-rows-[auto] 
                                      gap-x-4 gap-y-2 sm:gap-4 
-                                     p-5 ${
-                                       index === 0
-                                         ? 'bg-yellow-50'
-                                         : index === 1
-                                           ? 'bg-gray-50'
-                                           : index === 2
-                                             ? 'bg-amber-50'
-                                             : ''
-                                     } ${isCurrentUser ? 'border-l-4 border-primary' : ''}`}
+                                     p-5 ${isCurrentUser ? 'border-l-4 border-primary' : ''}`}
+                          style={{
+                            backgroundColor:
+                              index === 0
+                                ? 'var(--leaderboard-bg-gold)'
+                                : index === 1
+                                  ? 'var(--leaderboard-bg-silver)'
+                                  : index === 2
+                                    ? 'var(--leaderboard-bg-bronze)'
+                                    : 'var(--leaderboard-bg-other)',
+                          }}
                         >
                           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-background to-muted shadow-sm">
-                            <Medal className={`w-5 h-5 ${getMedalColor(index)}`} />
+                            <Medal className="w-5 h-5" style={{ color: getMedalColor(index) }} />
                           </div>
                           <div className="min-w-0 overflow-hidden">
                             <div className="flex items-center gap-1 flex-wrap">
