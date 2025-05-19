@@ -1,3 +1,9 @@
 {
-  "recommendations": ["biomejs.biome", "esbenp.prettier-vscode", "bradlc.vscode-tailwindcss"]
+  "recommendations": [
+    "biomejs.biome",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+    "tht13.html-preview-vscode",
+    "christian-kohler.path-intellisense"
+  ]
 }
