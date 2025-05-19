@@ -28,6 +28,62 @@ export function useTheme() {
   return context;
 }
 
+// Script to prevent flash of incorrect theme
+const themeScript = `
+(() => {
+  window.__theme = {
+    value: localStorage.getItem('theme') || 'system',
+    onThemeChange: () => {
+      const theme = window.__theme.value;
+      let nextTheme = theme;
+      // we interpret system theme to be the actual theme value for the transition
+      if (nextTheme === 'system') {
+        nextTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light';
+      }
+      switch (nextTheme) {
+        case 'dark': {
+          document.documentElement.classList.add('dark');
+          document.documentElement.style.backgroundColor = 'rgb(9, 9, 11)';
+          break;
+        }
+        case 'light': {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.style.backgroundColor = 'rgb(255, 255, 255)';
+          break;
+        }
+      }
+    },
+    /**
+     * @param {'light' | 'dark' | 'system'} theme - The theme to set.
+     * @description Sets the theme and updates the document background color.
+     */
+    setTheme: (theme) => {
+      if (theme == null) {
+        return;
+      }
+      // set the window values and persist
+      window.__theme.value = theme;
+      localStorage.setItem('theme', theme);
+
+      // trigger the update
+      window.__theme.onThemeChange();
+    },
+    init: () => {
+      const theme = window.__theme.value;
+      window.__theme.setTheme(theme);
+    },
+  };
+
+  window.__theme.init(); //trigger the initial theme
+
+  // listen to updates from the system
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  mediaQuery.addEventListener('change', window.__theme.onThemeChange);
+})();
+`;
+
 export function ThemeProvider({ children, targetSelector }: ThemeProviderProps) {
   // Custom attribute to use for theme application
   const attribute = targetSelector ? 'data-theme' : 'class';
@@ -50,6 +106,8 @@ export function ThemeProvider({ children, targetSelector }: ThemeProviderProps) 
   return (
     <>
       {/* Inject script to handle theme before React hydration */}
+      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: this script is controlled directly by source code inline */}
+      <script dangerouslySetInnerHTML={{ __html: themeScript }} suppressHydrationWarning />
 
       {mounted ? (
         <ThemeContext.Provider value={{ theme, setTheme }}>
@@ -73,4 +131,14 @@ export function ThemeProvider({ children, targetSelector }: ThemeProviderProps) 
       )}
     </>
   );
+}
+
+declare global {
+  interface Window {
+    __theme: {
+      value: Theme;
+      onThemeChange: () => void;
+      setTheme: (theme: Theme) => void;
+    };
+  }
 }
