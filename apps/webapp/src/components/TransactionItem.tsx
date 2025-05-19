@@ -46,26 +46,26 @@ export function TransactionItem({ transaction, onDelete }: TransactionItemProps)
   const getTransactionIcon = () => {
     switch (transactionType) {
       case 'income':
-        return <ArrowDownLeft className="h-4 w-4 text-emerald-500" />;
+        return <ArrowDownLeft className="h-4 w-4 text-success" />;
       case 'savings':
         return transaction.amount >= 0 ? (
-          <PiggyBank className="h-4 w-4 text-blue-500" />
+          <PiggyBank className="h-4 w-4 text-info" />
         ) : (
-          <ArrowUpRight className="h-4 w-4 text-blue-500" />
+          <ArrowUpRight className="h-4 w-4 text-info" />
         );
       default:
-        return <ArrowUpRight className="h-4 w-4 text-red-500" />;
+        return <ArrowUpRight className="h-4 w-4 text-error" />;
     }
   };
 
   const getAmountColor = () => {
     switch (transactionType) {
       case 'income':
-        return 'text-emerald-600';
+        return 'text-success';
       case 'savings':
-        return transaction.amount >= 0 ? 'text-blue-600' : 'text-red-600';
+        return transaction.amount >= 0 ? 'text-info' : 'text-error';
       default:
-        return 'text-red-600';
+        return 'text-error';
     }
   };
 

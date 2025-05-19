@@ -26,17 +26,17 @@ export default function LeaderboardPage() {
     timezoneOffsetMinutes, // Pass timezone offset
   });
 
-  // Function to get medal color
+  // Function to get medal color - improved for dark mode compatibility
   const getMedalColor = (position: number) => {
     switch (position) {
       case 0:
-        return 'text-yellow-500'; // Gold
+        return 'text-yellow-500 dark:text-yellow-400'; // Gold
       case 1:
-        return 'text-gray-400'; // Silver
+        return 'text-gray-400 dark:text-gray-300'; // Silver
       case 2:
-        return 'text-amber-700'; // Bronze
+        return 'text-amber-700 dark:text-amber-500'; // Bronze
       default:
-        return 'text-gray-300'; // Other positions
+        return 'text-gray-400 dark:text-gray-500'; // Other positions
     }
   };
 
@@ -45,7 +45,7 @@ export default function LeaderboardPage() {
       <div className="max-w-5xl mx-auto">
         <div className="mb-6 sm:mb-8 text-center">
           <h1 className="text-2xl sm:text-3xl font-bold mb-2 flex items-center justify-center">
-            <Trophy className="h-8 w-8 text-yellow-500 mr-2" />
+            <Trophy className="h-8 w-8 text-yellow-500 dark:text-yellow-400 mr-2" />
             Transaction Leaderboard <span className="ml-2">👑</span>
           </h1>
           <p className="text-muted-foreground mb-6">
@@ -88,11 +88,11 @@ export default function LeaderboardPage() {
                                      gap-x-4 gap-y-2 sm:gap-4 
                                      p-5 ${
                                        index === 0
-                                         ? 'bg-yellow-50'
+                                         ? 'bg-warning-bg/50 text-warning-foreground'
                                          : index === 1
-                                           ? 'bg-gray-50'
+                                           ? 'bg-muted/30 text-foreground'
                                            : index === 2
-                                             ? 'bg-amber-50'
+                                             ? 'bg-warning-bg/30 text-warning-foreground'
                                              : ''
                                      } ${isCurrentUser ? 'border-l-4 border-primary' : ''}`}
                         >
@@ -108,7 +108,7 @@ export default function LeaderboardPage() {
                               {index === 0 && <span className="ml-1">👑</span>}
                             </div>
                           </div>
-                          <div className="col-span-2 sm:col-span-1 font-mono font-bold text-base sm:text-lg bg-muted/30 px-3 py-1 rounded-full text-center break-all mt-1 sm:mt-0 sm:justify-self-end">
+                          <div className="col-span-2 sm:col-span-1 font-mono font-bold text-base sm:text-lg bg-background/60 px-3 py-1 rounded-full text-center break-all mt-1 sm:mt-0 sm:justify-self-end">
                             {user.transactionCount}
                             <span className="break-normal">
                               {' '}

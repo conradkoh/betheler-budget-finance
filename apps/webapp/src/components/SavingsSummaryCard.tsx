@@ -33,7 +33,7 @@ export function SavingsSummaryCard() {
         ) : (
           <div className="space-y-3">
             <div className="flex flex-col">
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-2xl font-bold text-info">
                 {formatCurrency(savingsSummary.netSavings)}
               </div>
               <div className="text-xs text-muted-foreground">Total Savings</div>
@@ -41,14 +41,14 @@ export function SavingsSummaryCard() {
 
             <div className="grid grid-cols-2 gap-2 pt-2 border-t">
               <div className="space-y-1">
-                <div className="text-sm font-medium text-blue-600">
+                <div className="text-sm font-medium text-info">
                   {formatCurrency(savingsSummary.totalSaved)}
                 </div>
                 <div className="text-xs text-muted-foreground">Amount Saved</div>
               </div>
 
               <div className="space-y-1">
-                <div className="text-sm font-medium text-red-600 flex items-center gap-1">
+                <div className="text-sm font-medium text-error flex items-center gap-1">
                   <ArrowUpRight className="h-3 w-3" />
                   {formatCurrency(savingsSummary.totalWithdrawn)}
                 </div>

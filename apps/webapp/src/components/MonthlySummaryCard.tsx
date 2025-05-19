@@ -122,11 +122,11 @@ export function MonthlySummaryCard({
             {/* Income */}
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <ArrowUpIcon className="h-4 w-4 text-green-500" />
+                <ArrowUpIcon className="h-4 w-4 text-success" />
                 <span className="text-sm">Total Income</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-medium text-green-600">
+                <span className="font-medium text-success">
                   {formatCurrency(summary.totalIncome)}
                 </span>
                 {showIncomeButton && (
@@ -157,11 +157,11 @@ export function MonthlySummaryCard({
             {/* Savings */}
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <PiggyBankIcon className="h-4 w-4 text-blue-500" />
+                <PiggyBankIcon className="h-4 w-4 text-info" />
                 <span className="text-sm">Total Savings</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-medium text-blue-600">
+                <span className="font-medium text-info">
                   {formatCurrency(summary.totalSavings)}
                 </span>
                 {showSavingsButton && (
@@ -194,16 +194,16 @@ export function MonthlySummaryCard({
               <div className="flex items-center gap-2">
                 <span className="text-sm font-semibold">Spendable Income</span>
               </div>
-              <span className="text-xl font-bold text-black">
+              <span className="text-xl font-bold">
                 {formatCurrency(summary.totalSpendableIncome)}
               </span>
             </div>
 
             {/* Budget Comparison Warning */}
             {!budgetMatchesSpendableIncome && !hasNoBudget && (
-              <div className="mt-1 p-3 bg-amber-50 border border-amber-200 rounded text-xs text-amber-800">
+              <div className="mt-1 p-3 bg-warning-bg border border-warning/20 rounded text-xs text-warning">
                 <div className="flex items-start gap-2 mb-2">
-                  <AlertTriangleIcon className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                  <AlertTriangleIcon className="h-4 w-4 text-warning flex-shrink-0 mt-0.5" />
                   <p>
                     Your total budget ({formatCurrency(budgetData.totalBudget)}) doesn't match your
                     spendable income.{' '}
@@ -216,7 +216,7 @@ export function MonthlySummaryCard({
                   {budgetIsHigher ? (
                     <Link
                       href={`/transactions?action=add-savings&amount=${budgetDifference}`}
-                      className="inline-flex items-center text-amber-700 hover:text-amber-900 text-xs font-medium gap-1"
+                      className="inline-flex items-center text-warning hover:text-warning/90 text-xs font-medium gap-1"
                     >
                       <PiggyBankIcon className="h-3 w-3" />
                       Add to Savings
@@ -224,7 +224,7 @@ export function MonthlySummaryCard({
                   ) : (
                     <Link
                       href="/budgets"
-                      className="inline-flex items-center text-amber-700 hover:text-amber-900 text-xs font-medium gap-1"
+                      className="inline-flex items-center text-warning hover:text-warning/90 text-xs font-medium gap-1"
                     >
                       <WrenchIcon className="h-3 w-3" />
                       Adjust Budget
@@ -236,9 +236,9 @@ export function MonthlySummaryCard({
 
             {/* Budget Zero State */}
             {hasNoBudget && (
-              <div className="mt-1 p-3 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800">
+              <div className="mt-1 p-3 bg-info-bg border border-info/20 rounded text-xs text-info">
                 <div className="flex items-start gap-2 mb-2">
-                  <AlertTriangleIcon className="h-4 w-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                  <AlertTriangleIcon className="h-4 w-4 text-info flex-shrink-0 mt-0.5" />
                   <p>
                     You haven't set up your budget for this month. Planning your budget helps you
                     track and manage your spending effectively.
@@ -281,10 +281,10 @@ export function MonthlySummaryCard({
             {/* Expenses */}
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <ArrowDownIcon className="h-4 w-4 text-red-500" />
+                <ArrowDownIcon className="h-4 w-4 text-error" />
                 <span className="text-sm">Total Expenses</span>
               </div>
-              <span className="font-medium text-red-600">
+              <span className="font-medium text-error">
                 {formatCurrency(summary.totalExpenses)}
               </span>
             </div>
@@ -301,9 +301,7 @@ export function MonthlySummaryCard({
               <div className="flex items-center gap-2">
                 <span className="text-sm font-semibold">Remaining Budget</span>
               </div>
-              <span
-                className={`text-xl font-bold ${remainingAllowance >= 0 ? 'text-black' : 'text-red-600'}`}
-              >
+              <span className={`text-xl font-bold ${remainingAllowance >= 0 ? '' : 'text-error'}`}>
                 {formatCurrency(Math.abs(remainingAllowance))}
                 {remainingAllowance < 0 && ' over'}
               </span>
@@ -312,7 +310,7 @@ export function MonthlySummaryCard({
             {/* Status Indicator */}
             <div className="flex items-center justify-center gap-1 mt-1">
               <div
-                className={`w-2 h-2 rounded-full ${remainingAllowance >= 0 ? 'bg-green-500' : 'bg-red-500'}`}
+                className={`w-2 h-2 rounded-full ${remainingAllowance >= 0 ? 'bg-success' : 'bg-error'}`}
               />
               <span className="text-xs text-muted-foreground">
                 {remainingAllowance >= 0

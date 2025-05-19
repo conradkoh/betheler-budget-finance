@@ -61,7 +61,7 @@ const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         {allowNegative && hasFocus && (
           <button
             type="button"
-            className="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 rounded-md"
+            className="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-1 text-xs bg-muted rounded-md"
             onClick={toggleNegative}
             tabIndex={-1}
           >

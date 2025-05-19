@@ -1,4 +1,5 @@
 import { formatCurrency } from '@/lib/formatCurrency';
+import { cn } from '@/lib/utils';
 import { api } from '@workspace/backend/convex/_generated/api';
 import type { Id } from '@workspace/backend/convex/_generated/dataModel';
 import { useSessionMutation } from 'convex-helpers/react/sessions';
@@ -93,9 +94,10 @@ export function BudgetItem({ budget, onDelete, year, month }: BudgetItemProps) {
               {budget.status === 'within_budget' ? 'Remaining:' : 'Over budget by:'}
             </p>
             <p
-              className={`font-medium ${
-                budget.status === 'within_budget' ? 'text-green-600' : 'text-red-600'
-              }`}
+              className={cn(
+                'font-medium',
+                budget.status === 'within_budget' ? 'text-success' : 'text-error'
+              )}
             >
               {budget.status === 'within_budget'
                 ? formatCurrency(budget.remaining)

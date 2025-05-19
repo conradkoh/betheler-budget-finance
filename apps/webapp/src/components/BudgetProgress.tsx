@@ -12,9 +12,9 @@ export function BudgetProgress({ percentage, status, className }: BudgetProgress
 
   // Determine the color based on the status and percentage
   const getColorClass = () => {
-    if (status === 'over_budget') return 'bg-red-500';
-    if (percentage > 80) return 'bg-amber-500';
-    return 'bg-emerald-500';
+    if (status === 'over_budget') return 'bg-error';
+    if (percentage > 80) return 'bg-warning';
+    return 'bg-success';
   };
 
   return (

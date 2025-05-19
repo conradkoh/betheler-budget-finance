@@ -1,6 +1,7 @@
 'use client';
 
 import { formatCurrency } from '@/lib/formatCurrency';
+import { cn } from '@/lib/utils';
 import { api } from '@workspace/backend/convex/_generated/api';
 import { useQuery } from 'convex/react';
 import {
@@ -231,13 +232,13 @@ export function SharedFinancialOverview({
                 {/* Income */}
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <ArrowUpIcon className="h-4 w-4 text-green-500" />
+                    <ArrowUpIcon className="h-4 w-4 text-success" />
                     <span className="text-sm">Total Income</span>
                   </div>
                   {isLoading ? (
                     <Skeleton className="h-5 w-20" />
                   ) : (
-                    <span className="font-medium text-green-600">
+                    <span className="font-medium text-success">
                       {formatCurrency(financialSummary.totalIncome)}
                     </span>
                   )}
@@ -253,13 +254,13 @@ export function SharedFinancialOverview({
                 {/* Savings */}
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <PiggyBankIcon className="h-4 w-4 text-blue-500" />
+                    <PiggyBankIcon className="h-4 w-4 text-info" />
                     <span className="text-sm">Total Savings</span>
                   </div>
                   {isLoading ? (
                     <Skeleton className="h-5 w-20" />
                   ) : (
-                    <span className="font-medium text-blue-600">
+                    <span className="font-medium text-info">
                       {formatCurrency(financialSummary.totalSavings)}
                     </span>
                   )}
@@ -318,13 +319,13 @@ export function SharedFinancialOverview({
                 {/* Expenses */}
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <ArrowDownIcon className="h-4 w-4 text-red-500" />
+                    <ArrowDownIcon className="h-4 w-4 text-error" />
                     <span className="text-sm">Total Expenses</span>
                   </div>
                   {isLoading ? (
                     <Skeleton className="h-5 w-20" />
                   ) : (
-                    <span className="font-medium text-red-600">
+                    <span className="font-medium text-error">
                       {formatCurrency(financialSummary.totalExpenses)}
                     </span>
                   )}
@@ -348,7 +349,7 @@ export function SharedFinancialOverview({
                       <Skeleton className="h-6 w-24" />
                     </div>
                     <div className="flex items-center justify-center gap-1 mt-1">
-                      <div className="w-2 h-2 rounded-full bg-gray-300" />
+                      <div className="w-2 h-2 rounded-full bg-muted" />
                       <Skeleton className="h-4 w-48" />
                     </div>
                   </div>
@@ -363,9 +364,10 @@ export function SharedFinancialOverview({
                             <span className="text-sm font-semibold">Remaining Budget</span>
                           </div>
                           <span
-                            className={`text-xl font-bold ${
-                              remainingAllowance >= 0 ? 'text-black' : 'text-red-600'
-                            }`}
+                            className={cn(
+                              'text-xl font-bold',
+                              remainingAllowance >= 0 ? '' : 'text-error'
+                            )}
                           >
                             {formatCurrency(Math.abs(remainingAllowance))}
                             {remainingAllowance < 0 && ' over'}
@@ -375,9 +377,10 @@ export function SharedFinancialOverview({
                         {/* Status Indicator */}
                         <div className="flex items-center justify-center gap-1 mt-1">
                           <div
-                            className={`w-2 h-2 rounded-full ${
-                              remainingAllowance >= 0 ? 'bg-green-500' : 'bg-red-500'
-                            }`}
+                            className={cn(
+                              'w-2 h-2 rounded-full',
+                              remainingAllowance >= 0 ? 'bg-success' : 'bg-error'
+                            )}
                           />
                           <span className="text-xs text-muted-foreground">
                             {remainingAllowance >= 0
@@ -402,32 +405,32 @@ export function SharedFinancialOverview({
         <div className="space-y-6">
           {/* Financial Information Summary */}
           <div className="grid grid-cols-3 gap-2">
-            <div className="p-3 bg-green-50 rounded">
-              <div className="text-green-800 font-medium">Income</div>
+            <div className="p-3 bg-success-bg rounded">
+              <div className="text-success font-medium">Income</div>
               {isLoading ? (
                 <Skeleton className="h-6 w-20 mt-1" />
               ) : (
-                <div className="text-green-600 text-lg font-semibold">
+                <div className="text-success text-lg font-semibold">
                   {formatCurrency(financialSummary.totalIncome)}
                 </div>
               )}
             </div>
-            <div className="p-3 bg-blue-50 rounded">
-              <div className="text-blue-800 font-medium">Savings</div>
+            <div className="p-3 bg-info-bg rounded">
+              <div className="text-info font-medium">Savings</div>
               {isLoading ? (
                 <Skeleton className="h-6 w-20 mt-1" />
               ) : (
-                <div className="text-blue-600 text-lg font-semibold">
+                <div className="text-info text-lg font-semibold">
                   {formatCurrency(financialSummary.totalSavings)}
                 </div>
               )}
             </div>
-            <div className="p-3 bg-amber-50 rounded">
-              <div className="text-amber-800 font-medium">Budgeted</div>
+            <div className="p-3 bg-warning-bg rounded">
+              <div className="text-warning font-medium">Budgeted</div>
               {isLoading ? (
                 <Skeleton className="h-6 w-20 mt-1" />
               ) : (
-                <div className="text-amber-600 text-lg font-semibold">
+                <div className="text-warning text-lg font-semibold">
                   {formatCurrency(budgetSummary.totalBudget)}
                 </div>
               )}

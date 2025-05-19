@@ -151,7 +151,7 @@ export function SharedTransactionView({ shareId }: SharedTransactionViewProps) {
             <Skeleton className="h-6 w-24 mb-2" />
           ) : (
             <span
-              className={`text-xl font-bold ${netCashFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}
+              className={`text-xl font-bold ${netCashFlow >= 0 ? 'text-success' : 'text-error'}`}
             >
               {formatCurrency(Math.abs(netCashFlow))}
             </span>
