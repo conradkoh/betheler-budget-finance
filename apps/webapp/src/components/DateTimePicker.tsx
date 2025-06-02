@@ -69,7 +69,7 @@ export function DateTimePicker({ value, onChange, className }: DateTimePickerPro
 
   return (
     <div className={cn('grid grid-cols-1 sm:grid-cols-2 gap-2', className)}>
-      <Popover>
+      <Popover modal={true}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
