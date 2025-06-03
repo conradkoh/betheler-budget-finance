@@ -1,0 +1,42 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Frontend Development
+This location of the frontend project is in `apps/webapp`.
+
+## IMPORTANT RULES
+- NEVER run the `dev` command to start the dev server unless explicitly told to do so.
+- NEVER run the `build` command to to test the app and prefer to rely on running tests and typechecks instead.
+
+## UI Design - Components & Icons
+
+This project uses the following libraries
+- Components
+    - ShadCN
+- Icons
+    - @radix-ui/react-icons
+    - lucide-react 
+
+
+### Shadcn
+- When adding a new component, use the command format `npx shadcn@latest add <component-name>`
+- ALWAYS run the shadcn component add command from within the webapp folder at `apps/webapp`
+
+## Next.js
+
+In the latest Next.js app router, the `params` prop for top-level pages is now passed in as a **Promise**. This means you must `await` the params before using them in your page components.
+
+## Example
+```ts
+export default async function MyComponent({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return (
+    <div>{id}</div>
+  );
+}
+```
+
+- Always destructure and use `await params` in your top-level page components.

@@ -10,8 +10,6 @@ export const getAuthUser = async (ctx: QueryCtx | MutationCtx, args: { sessionId
     throw new Error('Session not found');
   }
 
-  // Session expiry is deprecated and no longer checked.
-
   const user = await ctx.db.get(session.userId);
 
   if (!user) {
@@ -19,4 +17,15 @@ export const getAuthUser = async (ctx: QueryCtx | MutationCtx, args: { sessionId
   }
 
   return user;
+};
+
+export const getAuthUserOptional = async (
+  ctx: QueryCtx | MutationCtx,
+  args: { sessionId: SessionId }
+) => {
+  try {
+    return await getAuthUser(ctx, args);
+  } catch (error) {
+    return null;
+  }
 };

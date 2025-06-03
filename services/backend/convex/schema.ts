@@ -44,6 +44,20 @@ export default defineSchema({
     sessionId: v.optional(v.string()), // Session ID of the sender (optional)
   }).index('by_discussion', ['discussionKey']),
 
+  // Attendance-related tables
+  attendanceRecords: defineTable({
+    attendanceKey: v.string(), // The attendance session key (hardcoded)
+    timestamp: v.number(), // When the attendance was recorded
+    userId: v.optional(v.id('users')), // Optional user ID (for authenticated users)
+    name: v.optional(v.string()), // Name (required for anonymous users)
+    status: v.optional(v.union(v.literal('attending'), v.literal('not_attending'))), // Attendance status
+    reason: v.optional(v.string()), // Optional reason for not attending
+    remarks: v.optional(v.string()), // Optional remarks for attending
+  })
+    .index('by_attendance', ['attendanceKey'])
+    .index('by_name_attendance', ['attendanceKey', 'name'])
+    .index('by_user_attendance', ['attendanceKey', 'userId']),
+
   // auth
   users: defineTable(
     v.union(

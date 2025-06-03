@@ -19,6 +19,11 @@ export const useAuthState = () => {
   return authState;
 };
 
+export const useCurrentUser = () => {
+  const authState = useAuthState();
+  return authState?.state === 'authenticated' ? authState.user : undefined;
+};
+
 function withSessionProvider(Component: React.ComponentType<{ children: React.ReactNode }>) {
   return (props: { children: React.ReactNode }) => {
     return (

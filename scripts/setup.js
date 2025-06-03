@@ -135,6 +135,18 @@ function setup() {
   // Add upstream remote repository
   addUpstreamRemote();
 
+  // Disable Next.js telemetry
+  console.log('🔧 Disabling Next.js telemetry...');
+  try {
+    execSync('pnpm exec next telemetry disable', {
+      stdio: 'inherit',
+      cwd: path.join(__dirname, '..', 'apps', 'webapp'),
+    });
+    console.log('✅ Next.js telemetry disabled successfully.');
+  } catch (error) {
+    console.error('❌ Error disabling Next.js telemetry:', error.message);
+  }
+
   // Continue with the rest of the setup
   continueSetup();
 }

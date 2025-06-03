@@ -14,6 +14,10 @@ alwaysApply: true
     <core>Always use [progress.html](mdc:progress.html) to plan the tasks.</core>
 </directive>
 
+<warnings>
+    <level:danger>DO NOT RUN the `pnpm run dev` command</level:danger>
+</warnings>
+
 <verify>
     <check>Did you write your tasks inside [progress.html](mdc:progress.html)</check>
     <check>Did you mark your current active task as "in-progress" in [progress.html](mdc:progress.html)?</check>

@@ -1,9 +1,0 @@
----
-description: 
-globs: 
-alwaysApply: true
----
-
-# Coding
-- Avoid running terminal commands that require approval
-- Do not run terminal commands that are perpetually running. One such example is the `pnpm run dev` that should not be run
