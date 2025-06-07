@@ -68,6 +68,14 @@ export function DateRangePicker({
     setIsOpen(false);
   };
 
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      // Reset temp range to current value when opening
+      setTempRange(value);
+    }
+    setIsOpen(open);
+  };
+
   // Navigation functions for previous/next month
   const handlePrevMonth = () => {
     const prevMonth = subMonths(value.startDate, 1);
@@ -133,7 +141,7 @@ export function DateRangePicker({
       </Button>
 
       <div className="flex-1">
-        <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <Popover open={isOpen} onOpenChange={handleOpenChange}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
@@ -156,6 +164,7 @@ export function DateRangePicker({
                     mode="single"
                     selected={tempRange.startDate}
                     onSelect={handleStartDateSelect}
+                    defaultMonth={tempRange.startDate}
                     disabled={(date) => {
                       // Disable future dates
                       return date > new Date();
@@ -169,6 +178,7 @@ export function DateRangePicker({
                     mode="single"
                     selected={tempRange.endDate}
                     onSelect={handleEndDateSelect}
+                    defaultMonth={tempRange.endDate}
                     disabled={(date) => {
                       // Disable future dates and dates before start date
                       return date > new Date() || date < tempRange.startDate;
