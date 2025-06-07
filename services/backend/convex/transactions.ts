@@ -3,7 +3,7 @@ import { v } from 'convex/values';
 import { getAuthUser } from '../modules/auth/getAuthUser';
 import { api } from './_generated/api';
 import { mutation, query } from './_generated/server';
-import { getMonthDateRange, getMonthEndDateISO, getMonthStartDateISO } from './utils';
+import { getDateRange, getMonthDateRange, getMonthEndDateISO, getMonthStartDateISO } from './utils';
 
 export const create = mutation({
   args: {
@@ -525,6 +525,97 @@ export const getPublicLeaderboard = query({
     const leaderboardData = await Promise.all(
       users.map(async (userData) => {
         // Count transactions for this user within the specified month
+        const transactions = await ctx.db
+          .query('transactions')
+          .withIndex('by_userId_datetime', (q) =>
+            q.eq('userId', userData._id).gte('datetime', startDateISO).lte('datetime', endDateISO)
+          )
+          .collect();
+
+        return {
+          userId: userData._id,
+          name: userData.name,
+          transactionCount: transactions.length,
+        };
+      })
+    );
+
+    // Sort by transaction count (highest first)
+    return leaderboardData.sort((a, b) => b.transactionCount - a.transactionCount);
+  },
+});
+
+// Get transaction counts for all users in a specific date range for leaderboard
+export const getUserTransactionLeaderboardByDateRange = query({
+  args: {
+    ...SessionIdArg,
+    startDateISO: v.string(),
+    endDateISO: v.string(),
+    timezoneOffsetMinutes: v.number(),
+  },
+  handler: async (ctx, args) => {
+    // Ensure user is authenticated
+    const user = await getAuthUser(ctx, args);
+    if (!user) {
+      throw new Error('Unauthorized');
+    }
+
+    // Get the date range, adjusting for timezone
+    const { startDateISO, endDateISO } = getDateRange(
+      args.startDateISO,
+      args.endDateISO,
+      args.timezoneOffsetMinutes
+    );
+
+    // Get all users
+    const users = await ctx.db.query('users').collect();
+
+    // For each user, get their transaction count for the date range
+    const leaderboardData = await Promise.all(
+      users.map(async (userData) => {
+        // Count transactions for this user within the specified date range
+        const transactions = await ctx.db
+          .query('transactions')
+          .withIndex('by_userId_datetime', (q) =>
+            q.eq('userId', userData._id).gte('datetime', startDateISO).lte('datetime', endDateISO)
+          )
+          .collect();
+
+        return {
+          userId: userData._id,
+          name: userData.name,
+          transactionCount: transactions.length,
+        };
+      })
+    );
+
+    // Sort by transaction count (highest first)
+    return leaderboardData.sort((a, b) => b.transactionCount - a.transactionCount);
+  },
+});
+
+// Public leaderboard endpoint for date ranges that doesn't require authentication
+export const getPublicLeaderboardByDateRange = query({
+  args: {
+    startDateISO: v.string(),
+    endDateISO: v.string(),
+    timezoneOffsetMinutes: v.number(),
+  },
+  handler: async (ctx, args) => {
+    // Get the date range, adjusting for timezone
+    const { startDateISO, endDateISO } = getDateRange(
+      args.startDateISO,
+      args.endDateISO,
+      args.timezoneOffsetMinutes
+    );
+
+    // Get all users
+    const users = await ctx.db.query('users').collect();
+
+    // For each user, get their transaction count for the date range
+    const leaderboardData = await Promise.all(
+      users.map(async (userData) => {
+        // Count transactions for this user within the specified date range
         const transactions = await ctx.db
           .query('transactions')
           .withIndex('by_userId_datetime', (q) =>

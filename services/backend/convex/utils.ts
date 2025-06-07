@@ -108,3 +108,44 @@ export function getMonthDateRange(
     endDateISO: endDate.toISOString(),
   };
 }
+
+/**
+ * Create date range object with arbitrary start and end dates, adjusting for timezone
+ * @param startDateISO ISO string for the start date
+ * @param endDateISO ISO string for the end date
+ * @param timezoneOffsetMinutes Optional timezone offset in minutes (from client)
+ * @returns Object with startDate, endDate, startDateISO, and endDateISO adjusted for timezone
+ */
+export function getDateRange(
+  startDateISO: string,
+  endDateISO: string,
+  timezoneOffsetMinutes: number
+): {
+  startDate: Date;
+  endDate: Date;
+  startDateISO: string;
+  endDateISO: string;
+} {
+  // Parse the input dates
+  const startDate = new Date(startDateISO);
+  const endDate = new Date(endDateISO);
+
+  // Adjust for timezone if provided
+  if (timezoneOffsetMinutes !== undefined) {
+    startDate.setUTCMinutes(startDate.getUTCMinutes() + timezoneOffsetMinutes);
+    endDate.setUTCMinutes(endDate.getUTCMinutes() + timezoneOffsetMinutes);
+  }
+
+  // Set start date to beginning of day (00:00:00.000)
+  startDate.setUTCHours(0, 0, 0, 0);
+
+  // Set end date to end of day (23:59:59.999)
+  endDate.setUTCHours(23, 59, 59, 999);
+
+  return {
+    startDate,
+    endDate,
+    startDateISO: startDate.toISOString(),
+    endDateISO: endDate.toISOString(),
+  };
+}

@@ -1,28 +1,33 @@
 'use client';
 
-import { MonthYearPicker } from '@/components/MonthYearPicker';
+import { type DateRange, DateRangePicker } from '@/components/DateRangePicker';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuthState } from '@/modules/auth/AuthProvider';
 import { api } from '@workspace/backend/convex/_generated/api';
 import { useQuery } from 'convex/react';
+import { endOfMonth, startOfMonth } from 'date-fns';
 import { Medal, Trophy, Users } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 export default function LeaderboardPage() {
   const authState = useAuthState();
 
-  // Month/year state for the leaderboard
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const year = selectedDate.getFullYear();
-  const month = selectedDate.getMonth();
+  // Date range state for the leaderboard - default to current month
+  const [selectedDateRange, setSelectedDateRange] = useState<DateRange>(() => {
+    const now = new Date();
+    return {
+      startDate: startOfMonth(now),
+      endDate: endOfMonth(now),
+    };
+  });
 
   // Get the client's timezone offset in minutes
   const timezoneOffsetMinutes = useMemo(() => new Date().getTimezoneOffset(), []);
 
-  // Get leaderboard data using the public endpoint
-  const leaderboardData = useQuery(api.transactions.getPublicLeaderboard, {
-    year,
-    month,
+  // Get leaderboard data using the new date range endpoint
+  const leaderboardData = useQuery(api.transactions.getPublicLeaderboardByDateRange, {
+    startDateISO: selectedDateRange.startDate.toISOString(),
+    endDateISO: selectedDateRange.endDate.toISOString(),
     timezoneOffsetMinutes, // Pass timezone offset
   });
 
@@ -49,12 +54,16 @@ export default function LeaderboardPage() {
             Transaction Leaderboard <span className="ml-2">👑</span>
           </h1>
           <p className="text-muted-foreground mb-6">
-            See who's tracking their finances the most each month
+            See who's tracking their finances the most in your selected date range
           </p>
 
-          {/* Centered month picker */}
+          {/* Centered date range picker */}
           <div className="flex justify-center mb-4">
-            <MonthYearPicker value={selectedDate} onChange={setSelectedDate} className="mx-auto" />
+            <DateRangePicker
+              value={selectedDateRange}
+              onChange={setSelectedDateRange}
+              className="mx-auto max-w-md"
+            />
           </div>
         </div>
 
@@ -72,7 +81,7 @@ export default function LeaderboardPage() {
               <div>
                 {leaderboardData.length === 0 ? (
                   <p className="text-center text-muted-foreground py-10">
-                    No transaction data available for this month
+                    No transaction data available for this date range
                   </p>
                 ) : (
                   <div className="divide-y">
