@@ -4,15 +4,17 @@ import { UserMenu } from '@/components/UserMenu';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuthState } from '@/modules/auth/AuthProvider';
+import { featureFlags } from '@workspace/backend/config/featureFlags';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
 
 export function Navigation() {
-  const pathname = usePathname();
   const authState = useAuthState();
   const isAuthenticated = authState?.state === 'authenticated';
   const isLoading = authState === undefined;
+
+  const pathname = usePathname();
 
   // Memoize navigation items to prevent unnecessary recalculations
   const navItems = useMemo(
@@ -95,11 +97,7 @@ export function Navigation() {
               (isAuthenticated ? (
                 <UserMenu showNameOnMobile={false} alignMenu="end" />
               ) : (
-                <Link href="/login">
-                  <Button size="sm" variant="outline">
-                    Login
-                  </Button>
-                </Link>
+                !featureFlags.disableLogin && loginButton
               ))}
           </div>
         </div>

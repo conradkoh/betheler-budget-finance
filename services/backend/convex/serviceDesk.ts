@@ -1,4 +1,5 @@
 import { v } from 'convex/values';
+import { featureFlags } from '../config/featureFlags';
 import { generateLoginCode } from '../modules/auth/codeUtils';
 import { internalMutation } from './_generated/server';
 
@@ -48,6 +49,11 @@ export const generateTempLoginCode = internalMutation({
     userId: v.id('users'),
   },
   handler: async (ctx, args) => {
+    // Check if login is disabled
+    if (featureFlags.disableLogin) {
+      throw new Error('Login functionality is currently disabled');
+    }
+
     // Verify the user exists
     const user = await ctx.db.get(args.userId);
     if (!user) {

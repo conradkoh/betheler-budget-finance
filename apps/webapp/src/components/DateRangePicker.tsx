@@ -1,8 +1,8 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { addMonths, endOfMonth, format, startOfMonth, subMonths } from 'date-fns';
 import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { DateTime } from 'luxon';
 import * as React from 'react';
 import { Button } from './ui/button';
 import { Calendar } from './ui/calendar';
@@ -78,19 +78,19 @@ export function DateRangePicker({
 
   // Navigation functions for previous/next month
   const handlePrevMonth = () => {
-    const prevMonth = subMonths(value.startDate, 1);
+    const prevMonth = DateTime.fromJSDate(value.startDate).minus({ months: 1 });
     const newRange = {
-      startDate: startOfMonth(prevMonth),
-      endDate: endOfMonth(prevMonth),
+      startDate: prevMonth.startOf('month').toJSDate(),
+      endDate: prevMonth.endOf('month').toJSDate(),
     };
     onChange(newRange);
   };
 
   const handleNextMonth = () => {
-    const nextMonth = addMonths(value.startDate, 1);
+    const nextMonth = DateTime.fromJSDate(value.startDate).plus({ months: 1 });
     const newRange = {
-      startDate: startOfMonth(nextMonth),
-      endDate: endOfMonth(nextMonth),
+      startDate: nextMonth.startOf('month').toJSDate(),
+      endDate: nextMonth.endOf('month').toJSDate(),
     };
     onChange(newRange);
   };
@@ -100,8 +100,8 @@ export function DateRangePicker({
       return placeholder;
     }
 
-    const start = format(value.startDate, 'MMM d, yyyy');
-    const end = format(value.endDate, 'MMM d, yyyy');
+    const start = DateTime.fromJSDate(value.startDate).toFormat('MMM d, yyyy');
+    const end = DateTime.fromJSDate(value.endDate).toFormat('MMM d, yyyy');
 
     if (start === end) {
       return start;
@@ -112,19 +112,20 @@ export function DateRangePicker({
 
   // Check if current range is a full month to enable/disable navigation
   const isFullMonth = React.useMemo(() => {
-    const monthStart = startOfMonth(value.startDate);
-    const monthEnd = endOfMonth(value.startDate);
-    return (
-      value.startDate.getTime() === monthStart.getTime() &&
-      value.endDate.getTime() === monthEnd.getTime()
-    );
+    const startDateTime = DateTime.fromJSDate(value.startDate);
+    const endDateTime = DateTime.fromJSDate(value.endDate);
+    const monthStart = startDateTime.startOf('month');
+    const monthEnd = startDateTime.endOf('month');
+
+    return startDateTime.hasSame(monthStart, 'day') && endDateTime.hasSame(monthEnd, 'day');
   }, [value.startDate, value.endDate]);
 
   // Get current date to disable next month button if current month is selected
   const isCurrentMonth = React.useMemo(() => {
     if (!isFullMonth) return false;
-    const now = new Date();
-    return format(now, 'yyyy-MM') === format(value.startDate, 'yyyy-MM');
+    const now = DateTime.now();
+    const startDateTime = DateTime.fromJSDate(value.startDate);
+    return now.hasSame(startDateTime, 'month');
   }, [value.startDate, isFullMonth]);
 
   return (

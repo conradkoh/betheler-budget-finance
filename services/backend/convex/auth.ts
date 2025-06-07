@@ -1,6 +1,7 @@
 import { SessionIdArg } from 'convex-helpers/server/sessions';
 import { v } from 'convex/values';
 import { ConvexError } from 'convex/values';
+import { featureFlags } from '../config/featureFlags';
 import { generateLoginCode, getCodeExpirationTime, isCodeExpired } from '../modules/auth/codeUtils';
 import type { AuthState } from '../modules/auth/types/AuthState';
 import { api, internal } from './_generated/api';
@@ -109,6 +110,14 @@ export const loginAnon = mutation({
     ...SessionIdArg,
   },
   handler: async (ctx, args) => {
+    // Check if login is disabled
+    if (featureFlags.disableLogin) {
+      throw new ConvexError({
+        code: 'FEATURE_DISABLED',
+        message: 'Login functionality is currently disabled',
+      });
+    }
+
     // Check if the session exists
     const existingSession = await ctx.db
       .query('sessions')
@@ -225,6 +234,15 @@ export const getActiveLoginCode = query({
     ...SessionIdArg,
   },
   handler: async (ctx, args) => {
+    // Check if login is disabled
+    if (featureFlags.disableLogin) {
+      return {
+        success: false,
+        reason: 'feature_disabled',
+        message: 'Login functionality is currently disabled',
+      };
+    }
+
     // Find the session by sessionId
     const existingSession = await ctx.db
       .query('sessions')
@@ -263,6 +281,14 @@ export const createLoginCode = mutation({
     ...SessionIdArg,
   },
   handler: async (ctx, args) => {
+    // Check if login is disabled
+    if (featureFlags.disableLogin) {
+      throw new ConvexError({
+        code: 'FEATURE_DISABLED',
+        message: 'Login functionality is currently disabled',
+      });
+    }
+
     // Find the session by sessionId
     const existingSession = await ctx.db
       .query('sessions')
@@ -325,6 +351,15 @@ export const verifyLoginCode = mutation({
     ...SessionIdArg,
   },
   handler: async (ctx, args) => {
+    // Check if login is disabled
+    if (featureFlags.disableLogin) {
+      return {
+        success: false,
+        reason: 'feature_disabled',
+        message: 'Login functionality is currently disabled',
+      };
+    }
+
     // Clean up the code (removing dashes if any)
     const cleanCode = args.code.replace(/-/g, '').toUpperCase();
 
@@ -403,6 +438,11 @@ export const checkCodeValidity = query({
     code: v.string(),
   },
   handler: async (ctx, args) => {
+    // Check if login is disabled
+    if (featureFlags.disableLogin) {
+      return false;
+    }
+
     // Clean up the code (removing dashes if any)
     const cleanCode = args.code.replace(/-/g, '').toUpperCase();
 
@@ -501,6 +541,14 @@ export const getOrCreateRecoveryCode = action({
     ctx: ActionCtx,
     args: { sessionId: string }
   ): Promise<{ success: boolean; recoveryCode?: string; reason?: string }> => {
+    // Check if login is disabled
+    if (featureFlags.disableLogin) {
+      return {
+        success: false,
+        reason: 'feature_disabled',
+      };
+    }
+
     // Find the session by sessionId
     const existingSession = await ctx.runQuery(internal.auth.getSessionBySessionId, {
       sessionId: args.sessionId,
@@ -542,6 +590,14 @@ export const verifyRecoveryCode = action({
     ctx: ActionCtx,
     args: { recoveryCode: string; sessionId: string }
   ): Promise<{ success: boolean; user?: Doc<'users'>; reason?: string }> => {
+    // Check if login is disabled
+    if (featureFlags.disableLogin) {
+      return {
+        success: false,
+        reason: 'feature_disabled',
+      };
+    }
+
     // Find the user with the given recovery code
     const user = await ctx.runQuery(internal.auth.getUserByRecoveryCode, {
       recoveryCode: args.recoveryCode,
@@ -588,6 +644,14 @@ export const regenerateRecoveryCode = action({
     ctx: ActionCtx,
     args: { sessionId: string }
   ): Promise<{ success: boolean; recoveryCode?: string; reason?: string }> => {
+    // Check if login is disabled
+    if (featureFlags.disableLogin) {
+      return {
+        success: false,
+        reason: 'feature_disabled',
+      };
+    }
+
     // Find the session by sessionId
     const existingSession = await ctx.runQuery(internal.auth.getSessionBySessionId, {
       sessionId: args.sessionId,

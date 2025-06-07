@@ -20,6 +20,6 @@
     "isolatedModules": true,
     "noEmit": true
   },
-  "include": ["./**/*"],
+  "include": ["./**/*", "../config/featureFlags.ts"],
   "exclude": ["./_generated"]
 }

@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { AnonymousLoginButton } from '@/modules/auth/AnonymousLoginButton';
 import { useAuthState } from '@/modules/auth/AuthProvider';
-import { KeyRound, KeySquare, Loader2 } from 'lucide-react';
+import { featureFlags } from '@workspace/backend/config/featureFlags';
+import { AlertCircle, KeyRound, KeySquare, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -33,6 +34,35 @@ export default function LoginPage() {
         <div className="flex flex-col items-center gap-2">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <p className="text-sm text-muted-foreground">Loading...</p>
+        </div>
+      </main>
+    );
+  }
+
+  // Show disabled state when login is disabled
+  if (featureFlags.disableLogin) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center p-4 md:p-24">
+        <div className="w-full max-w-md space-y-6">
+          <Card className="p-8">
+            <div className="space-y-6 text-center">
+              <div className="space-y-2">
+                <AlertCircle className="mx-auto h-16 w-16 text-muted-foreground/60" />
+                <h1 className="text-2xl font-semibold">Login Disabled</h1>
+                <p className="text-muted-foreground">
+                  Login functionality has been disabled for this application.
+                </p>
+              </div>
+
+              <div className="pt-4">
+                <Link href="/">
+                  <Button variant="outline" className="w-full">
+                    Return to Home
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </Card>
         </div>
       </main>
     );

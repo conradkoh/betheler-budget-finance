@@ -7,6 +7,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider } from '@/modules/auth/AuthProvider';
 import { ThemeProvider } from '@/modules/theme/ThemeProvider';
 import type { Theme } from '@/modules/theme/theme-utils';
+import { StagewiseToolbar } from '@stagewise/toolbar-next';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -66,6 +67,7 @@ export default function RootLayout({
           </AuthProvider>
         </ConvexClientProvider>
         <Toaster />
+        {process.env.NODE_ENV === 'development' && <StagewiseToolbar config={{ plugins: [] }} />}
       </body>
     </html>
   );
