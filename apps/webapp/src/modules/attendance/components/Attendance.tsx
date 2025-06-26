@@ -1,220 +1,183 @@
+import { CheckCircle2, ChevronDown, Copy, MoreVertical, UserPlus, X, XCircle } from 'lucide-react';
+// External imports
+import { Suspense, useCallback, useEffect, useState } from 'react';
+
+// UI component imports
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useCurrentUser } from '@/modules/auth/AuthProvider';
-import { api } from '@workspace/backend/convex/_generated/api';
-import type { Doc } from '@workspace/backend/convex/_generated/dataModel';
-import { useSessionQuery } from 'convex-helpers/react/sessions';
-import { CheckCircle2, ChevronDown, LogIn, XCircle } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useCallback, useEffect, useState } from 'react';
+
+// Internal imports
+import { isCurrentUser, useAttendanceData } from '../hooks/useAttendanceData';
+import { AttendanceCopyDialog } from './AttendanceCopyDialog';
 import { AttendanceDialog } from './AttendanceDialog';
 import { AttendanceEmptyState } from './AttendanceEmptyState';
 
-interface AttendanceModuleProps {
+/**
+ * Props for the Attendance component.
+ */
+export interface AttendanceModuleProps {
   attendanceKey: string;
   title: string;
   expectedNames?: string[];
+  remarksPlaceholder?: string;
 }
 
-// Internal component that uses useSearchParams
-const AttendanceContent = ({
+/**
+ * Internal component state interface for managing local UI state.
+ */
+interface _AttendanceContentState {
+  expanded: string | null;
+  dialogOpen: boolean;
+  selectedPerson: string;
+  showFullListModal: boolean;
+  isManualJoin: boolean;
+  showCopyDialog: boolean;
+}
+
+/**
+ * Main attendance content component that handles attendance list display and interactions.
+ * Uses useSearchParams internally so it's wrapped in Suspense by the parent component.
+ */
+const _AttendanceContent = ({
   attendanceKey,
   title = 'Attendance',
   expectedNames = [],
+  remarksPlaceholder,
 }: AttendanceModuleProps) => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const currentUser = useCurrentUser();
-  const isAuthenticated = currentUser !== undefined;
+  // Use the custom hook for all data management
+  const {
+    attendanceData,
+    attendanceRecords,
+    attendanceMap,
+    allNames,
+    pendingNames,
+    filteredRespondedNames,
+    modalFilteredNames,
+    attendingCount,
+    notAttendingCount,
+    pendingCount,
+    respondedAttendingCount,
+    respondedNotAttendingCount,
+    activeTab,
+    searchQuery,
+    modalSearchQuery,
+    statusFilter,
+    isAuthenticated,
+    currentUser,
+    isCurrentUserRegistered,
+    setSearchQuery,
+    setModalSearchQuery,
+    setStatusFilter,
+    handleTabChange,
+  } = useAttendanceData({ attendanceKey, expectedNames });
+
+  // Local component state
   const [expanded, setExpanded] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPerson, setSelectedPerson] = useState<string>('');
-  const [searchQuery, setSearchQuery] = useState('');
   const [showFullListModal, setShowFullListModal] = useState(false);
-  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
-  const [modalSearchQuery, setModalSearchQuery] = useState('');
-  const attendanceData = useSessionQuery(api.attendance.getAttendanceData, {
-    attendanceKey,
-  });
+  const [isManualJoin, setIsManualJoin] = useState(false);
+  const [showCopyDialog, setShowCopyDialog] = useState(false);
 
-  // Get attendance tab from URL or default
-  const attendanceTabFromUrl = searchParams.get('attendanceTab');
-
-  const [activeTab, setActiveTab] = useState<'pending' | 'responded'>(() => {
-    if (attendanceTabFromUrl === 'pending' || attendanceTabFromUrl === 'responded') {
-      return attendanceTabFromUrl;
-    }
-    // Fallback to default based on data only if no tab in URL
-    if (attendanceData !== undefined && !currentUserResponse) {
-      return 'pending';
-    }
-    return 'responded';
-  });
-
-  // Update URL when tab changes
-  const handleTabChange = useCallback(
-    (tab: 'pending' | 'responded') => {
-      setActiveTab(tab);
-      const params = new URLSearchParams(searchParams.toString());
-      params.set('attendanceTab', tab);
-      // Keep the main tab parameter if it exists
-      router.push(`?${params.toString()}`, { scroll: false });
-    },
-    [router, searchParams]
-  );
-
-  const attendanceRecords = attendanceData?.records || [];
-  const currentUserResponse = attendanceData?.currentUserResponse;
-
-  // Effect to update active tab based on URL changes (if not triggered by internal click)
-  useEffect(() => {
-    const tabFromUrl = searchParams.get('attendanceTab');
-    if (tabFromUrl === 'pending' || tabFromUrl === 'responded') {
-      setActiveTab(tabFromUrl);
-    } else if (attendanceData !== undefined && !currentUserResponse) {
-      // Set to pending only if no tab in URL and user hasn't responded
-      setActiveTab('pending');
-    } else {
-      setActiveTab('responded');
-    }
-  }, [searchParams, attendanceData, currentUserResponse]); // Depend on searchParams to react to URL changes
-
-  // Check if the current user is already in the attendance list
-  const isCurrentUserRegistered = Boolean(currentUserResponse);
-
-  // Create a map of names to their attendance records
-  const attendanceMap = new Map<string, Doc<'attendanceRecords'>>();
-  for (const record of attendanceRecords) {
-    if (record.name) {
-      attendanceMap.set(record.name, record);
-    }
-  }
-
-  const handleJoin = () => {
-    if (!isAuthenticated || !currentUser) {
-      setLoginDialogOpen(true);
-      return;
-    }
-
-    // Open the dialog with the current user's name pre-selected
-    setSelectedPerson(currentUser.name);
-    setDialogOpen(true);
-  };
-
-  const toggleExpand = (name: string) => {
-    setExpanded(expanded === name ? null : name);
-  };
-
-  const handlePersonClick = (name: string) => {
-    setSelectedPerson(name);
-    setDialogOpen(true);
-  };
-
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-    setSelectedPerson('');
-  };
-
-  // Handle successful attendance submission
+  /**
+   * Handle successful attendance submission by switching to responded tab.
+   */
   const handleAttendanceSuccess = useCallback(() => {
-    // Switch to responded tab after successful attendance submission
     handleTabChange('responded');
   }, [handleTabChange]);
 
-  // Check if a record belongs to the current user by comparing user IDs
-  const isCurrentUser = (name: string) => {
-    const record = attendanceMap.get(name);
-    return isAuthenticated && currentUser && record?.userId === currentUser._id;
-  };
+  /**
+   * Handle joining the attendance list by opening the dialog with appropriate defaults.
+   */
+  const handleJoin = useCallback(() => {
+    const defaultName = isAuthenticated && currentUser ? currentUser.name : '';
+    setSelectedPerson(defaultName);
+    setIsManualJoin(true);
+    setDialogOpen(true);
+  }, [isAuthenticated, currentUser]);
 
-  // Prepare the combined list of names (expected + recorded)
-  const allNames = new Set<string>();
-
-  // Add expected names
-  if (expectedNames) {
-    for (const name of expectedNames) {
-      allNames.add(name);
-    }
-  }
-
-  // Add recorded names
-  for (const record of attendanceRecords) {
-    if (record.name) {
-      allNames.add(record.name);
-    }
-  }
-
-  // Convert set to array and filter by search query for main lists
-  const filteredNames = Array.from(allNames).filter((name) =>
-    name.toLowerCase().includes(searchQuery.toLowerCase())
+  /**
+   * Handle clicking on a person's name to edit their attendance status.
+   */
+  const handlePersonClick = useCallback(
+    (name: string) => {
+      setSelectedPerson(name);
+      const wasInExpectedList = expectedNames?.includes(name);
+      setIsManualJoin(!wasInExpectedList);
+      setDialogOpen(true);
+    },
+    [expectedNames]
   );
 
-  // Separate names into pending and responded
-  const pendingNames = filteredNames.filter((name) => {
-    const record = attendanceMap.get(name);
-    return !record?.status;
-  });
+  /**
+   * Handle closing the attendance dialog and resetting state.
+   */
+  const handleDialogClose = useCallback(() => {
+    setDialogOpen(false);
+    setSelectedPerson('');
+    setIsManualJoin(false);
+  }, []);
 
-  const respondedNames = filteredNames.filter((name) => {
-    const record = attendanceMap.get(name);
-    return record?.status;
-  });
-
-  // Get the names to display based on active tab
-  const displayNames = activeTab === 'pending' ? pendingNames : respondedNames;
-
-  // For the modal, we want to keep a separate list filtered by modalSearchQuery
-  const modalFilteredNames = Array.from(allNames).filter((name) => {
-    // If we're in the modal, use the activeTab to determine which list to show
-    const record = attendanceMap.get(name);
-    const isInActiveTabList = activeTab === 'pending' ? !record?.status : record?.status;
-
-    // Then filter by the modal search query
-    return isInActiveTabList && name.toLowerCase().includes(modalSearchQuery.toLowerCase());
-  });
-
-  const attendingCount = attendanceRecords.filter((r) => r.status === 'attending').length;
-  const notAttendingCount = attendanceRecords.filter((r) => r.status === 'not_attending').length;
-  const pendingCount = pendingNames.length;
-
-  // Reset modal search when opening the modal
+  /**
+   * Reset modal search when the full list modal is opened.
+   */
   useEffect(() => {
     if (showFullListModal) {
       setModalSearchQuery('');
     }
-  }, [showFullListModal]);
+  }, [showFullListModal, setModalSearchQuery]);
 
   return (
     <>
       <div className="pb-3">
         <h2 className="text-lg flex justify-between items-center">
           <span>{title}</span>
-          {attendanceData === undefined ? (
-            <Skeleton className="h-6 w-20" />
-          ) : (
-            <div className="flex space-x-2">
-              <Badge variant="outline" className="bg-green-50">
-                <CheckCircle2 className="h-3 w-3 mr-1" /> {attendingCount}
-              </Badge>
-              <Badge variant="outline" className="bg-red-50">
-                <XCircle className="h-3 w-3 mr-1" /> {notAttendingCount}
-              </Badge>
-              {pendingCount > 0 && <Badge variant="outline">{pendingCount} pending</Badge>}
-            </div>
-          )}
+          <div className="flex items-center space-x-2">
+            {attendanceData === undefined ? (
+              <Skeleton className="h-6 w-20" />
+            ) : (
+              <>
+                <Badge variant="outline" className="bg-green-50">
+                  <CheckCircle2 className="h-3 w-3 mr-1" /> {attendingCount}
+                </Badge>
+                <Badge variant="outline" className="bg-red-50">
+                  <XCircle className="h-3 w-3 mr-1" /> {notAttendingCount}
+                </Badge>
+                {pendingCount > 0 && <Badge variant="outline">{pendingCount} pending</Badge>}
+
+                {/* Action Menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onClick={() => setShowCopyDialog(true)}
+                      className="cursor-pointer flex items-center gap-2"
+                    >
+                      <Copy className="h-4 w-4" />
+                      Copy List as Text
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            )}
+          </div>
         </h2>
       </div>
+
       <div>
         {attendanceData === undefined ? (
           <div className="space-y-2">
@@ -241,7 +204,7 @@ const AttendanceContent = ({
             >
               <TabsList className="w-full mb-4">
                 <TabsTrigger value="responded" className="flex-1">
-                  Responded ({respondedNames.length})
+                  Responded ({filteredRespondedNames.length})
                 </TabsTrigger>
                 <TabsTrigger value="pending" className="flex-1">
                   Pending ({pendingNames.length})
@@ -249,16 +212,63 @@ const AttendanceContent = ({
               </TabsList>
 
               <TabsContent value="responded">
-                {respondedNames.length === 0 ? (
-                  <AttendanceEmptyState message="No results found" onJoin={handleJoin} />
+                {/* Status Filter Buttons */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <Button
+                    variant={statusFilter === 'attending' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setStatusFilter('attending')}
+                    className="flex items-center gap-1"
+                  >
+                    <CheckCircle2 className="h-3 w-3 text-green-500" />
+                    Attending
+                    <Badge variant="secondary" className="ml-1 text-xs">
+                      {respondedAttendingCount}
+                    </Badge>
+                  </Button>
+                  <Button
+                    variant={statusFilter === 'not_attending' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setStatusFilter('not_attending')}
+                    className="flex items-center gap-1"
+                  >
+                    <XCircle className="h-3 w-3 text-red-500" />
+                    Not Attending
+                    <Badge variant="secondary" className="ml-1 text-xs">
+                      {respondedNotAttendingCount}
+                    </Badge>
+                  </Button>
+                  {statusFilter !== 'all' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setStatusFilter('all')}
+                      className="flex items-center gap-1 px-2"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+
+                {filteredRespondedNames.length === 0 ? (
+                  <AttendanceEmptyState
+                    message="No results found"
+                    onJoin={handleJoin}
+                    showJoinButton={!searchQuery.trim()}
+                  />
                 ) : (
                   <div className="space-y-2">
-                    {respondedNames.slice(0, 7).map((name) => {
+                    {filteredRespondedNames.slice(0, 7).map((name) => {
                       const record = attendanceMap.get(name);
                       const status = record?.status;
                       const reason = record?.reason;
                       const remarks = record?.remarks;
-                      const isYou = isCurrentUser(name);
+                      const isYou = isCurrentUser(
+                        name,
+                        attendanceMap,
+                        isAuthenticated,
+                        currentUser
+                      );
 
                       return (
                         <div key={name} className="p-2 border rounded-md relative hover:bg-gray-50">
@@ -280,10 +290,10 @@ const AttendanceContent = ({
                               ) : (
                                 <div className="h-4 w-4 rounded-full border mr-2 flex-shrink-0" />
                               )}
-                              <span className="ml-2">
+                              <span className="ml-2 text-sm">
                                 {name}
                                 {isYou && (
-                                  <span className="ml-1 text-sm text-muted-foreground">(you)</span>
+                                  <span className="ml-1 text-xs text-muted-foreground">(you)</span>
                                 )}
                               </span>
                             </div>
@@ -300,13 +310,13 @@ const AttendanceContent = ({
                         </div>
                       );
                     })}
-                    {respondedNames.length > 7 && (
+                    {filteredRespondedNames.length > 7 && (
                       <Button
                         variant="ghost"
                         className="w-full mt-3 text-muted-foreground hover:text-foreground h-9 rounded-md transition-colors flex items-center justify-center"
                         onClick={() => setShowFullListModal(true)}
                       >
-                        View {respondedNames.length} more responses
+                        View {filteredRespondedNames.length - 7} more responses
                         <ChevronDown className="ml-2 h-4 w-4" />
                       </Button>
                     )}
@@ -316,11 +326,20 @@ const AttendanceContent = ({
 
               <TabsContent value="pending">
                 {pendingNames.length === 0 ? (
-                  <AttendanceEmptyState message="No results found" onJoin={handleJoin} />
+                  <AttendanceEmptyState
+                    message="No results found"
+                    onJoin={handleJoin}
+                    showJoinButton={!searchQuery.trim()}
+                  />
                 ) : (
                   <div className="space-y-2">
                     {pendingNames.slice(0, 7).map((name) => {
-                      const isYou = isCurrentUser(name);
+                      const isYou = isCurrentUser(
+                        name,
+                        attendanceMap,
+                        isAuthenticated,
+                        currentUser
+                      );
                       return (
                         <div key={name} className="p-2 border rounded-md relative hover:bg-gray-50">
                           <button
@@ -335,10 +354,10 @@ const AttendanceContent = ({
                           >
                             <div className="flex items-center">
                               <div className="h-4 w-4 rounded-full border mr-2 flex-shrink-0" />
-                              <span className="ml-2">
+                              <span className="ml-2 text-sm">
                                 {name}
                                 {isYou && (
-                                  <span className="ml-1 text-sm text-muted-foreground">(you)</span>
+                                  <span className="ml-1 text-xs text-muted-foreground">(you)</span>
                                 )}
                               </span>
                             </div>
@@ -360,35 +379,38 @@ const AttendanceContent = ({
                 )}
               </TabsContent>
             </Tabs>
+
+            {/* Join button below component */}
+            {(!isAuthenticated || !isCurrentUserRegistered) && (
+              <div className="mt-6 text-center">
+                <p className="text-muted-foreground mb-2">Don't see your name?</p>
+                <Button
+                  onClick={handleJoin}
+                  className="flex items-center justify-center mx-auto w-fit"
+                  variant="outline"
+                >
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Join the list
+                </Button>
+              </div>
+            )}
           </>
         )}
       </div>
 
-      {/* Login dialog */}
-      <Dialog open={loginDialogOpen} onOpenChange={setLoginDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Login Required</DialogTitle>
-            <DialogDescription>You need to be logged in to mark your attendance.</DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex justify-end gap-2 mt-4">
-            <Button variant="outline" onClick={() => setLoginDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={() => router.push('/login')} className="flex items-center">
-              <LogIn className="h-4 w-4 mr-2" /> Go to Login
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Full list modal - update to show based on active tab */}
+      {/* Full list modal */}
       <Dialog open={showFullListModal} onOpenChange={setShowFullListModal}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>
-              {activeTab === 'pending' ? 'Pending Responses' : 'All Responses'} (
-              {displayNames.length})
+              {activeTab === 'pending'
+                ? 'Pending Responses'
+                : statusFilter === 'all'
+                  ? 'All Responses'
+                  : statusFilter === 'attending'
+                    ? 'Attending Responses'
+                    : 'Not Attending Responses'}{' '}
+              ({modalFilteredNames.length})
             </DialogTitle>
           </DialogHeader>
           <div className="mb-4">
@@ -409,7 +431,7 @@ const AttendanceContent = ({
                     const status = record?.status;
                     const reason = record?.reason;
                     const remarks = record?.remarks;
-                    const isYou = isCurrentUser(name);
+                    const isYou = isCurrentUser(name, attendanceMap, isAuthenticated, currentUser);
 
                     return (
                       <div key={name} className="p-2 border rounded-md relative hover:bg-gray-50">
@@ -418,12 +440,16 @@ const AttendanceContent = ({
                           type="button"
                           onClick={() => {
                             setSelectedPerson(name);
+                            const wasInExpectedList = expectedNames?.includes(name);
+                            setIsManualJoin(!wasInExpectedList);
                             setDialogOpen(true);
                             setShowFullListModal(false);
                           }}
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') {
                               setSelectedPerson(name);
+                              const wasInExpectedList = expectedNames?.includes(name);
+                              setIsManualJoin(!wasInExpectedList);
                               setDialogOpen(true);
                               setShowFullListModal(false);
                             }
@@ -437,10 +463,10 @@ const AttendanceContent = ({
                             ) : (
                               <div className="h-4 w-4 rounded-full border mr-2 flex-shrink-0" />
                             )}
-                            <span className="ml-2">
+                            <span className="ml-2 text-sm">
                               {name}
                               {isYou && (
-                                <span className="ml-1 text-sm text-muted-foreground">(you)</span>
+                                <span className="ml-1 text-xs text-muted-foreground">(you)</span>
                               )}
                             </span>
                           </div>
@@ -465,12 +491,24 @@ const AttendanceContent = ({
                     setShowFullListModal(false);
                     handleJoin();
                   }}
+                  showJoinButton={!modalSearchQuery.trim()}
                 />
               )}
             </ScrollArea>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Copy Configuration Dialog */}
+      <AttendanceCopyDialog
+        isOpen={showCopyDialog}
+        onClose={() => setShowCopyDialog(false)}
+        title={title}
+        activeTab={activeTab}
+        statusFilter={statusFilter}
+        allNames={allNames}
+        attendanceMap={attendanceMap}
+      />
 
       {dialogOpen && attendanceRecords && (
         <AttendanceDialog
@@ -480,13 +518,18 @@ const AttendanceContent = ({
           attendanceKey={attendanceKey}
           attendanceRecords={attendanceRecords}
           onSuccess={handleAttendanceSuccess}
+          isManuallyJoined={isManualJoin}
+          remarksPlaceholder={remarksPlaceholder}
         />
       )}
     </>
   );
 };
 
-// Main component with Suspense boundary
+/**
+ * Main Attendance component with Suspense boundary for handling async operations.
+ * Provides attendance tracking functionality with tabs for pending and responded users.
+ */
 export const Attendance = (props: AttendanceModuleProps) => {
   return (
     <Suspense
@@ -498,7 +541,7 @@ export const Attendance = (props: AttendanceModuleProps) => {
         </div>
       }
     >
-      <AttendanceContent {...props} />
+      <_AttendanceContent {...props} />
     </Suspense>
   );
 };

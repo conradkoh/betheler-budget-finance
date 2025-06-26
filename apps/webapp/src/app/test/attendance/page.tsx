@@ -23,6 +23,7 @@ export default function AttendanceTestPage() {
         attendanceKey="weekly-team-meeting"
         title="Weekly Team Meeting"
         expectedNames={attendeeNames}
+        remarksPlaceholder="Here are some custom remarks"
       />
     </div>
   );

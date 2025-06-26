@@ -11,13 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  EyeIcon,
-  EyeOffIcon,
-  EyeOffIcon as HideIcon,
-  LockIcon,
-  MoreVerticalIcon,
-} from 'lucide-react';
+import { EyeOffIcon as HideIcon, LockIcon, MoreVerticalIcon } from 'lucide-react';
 import type React from 'react';
 import { useCallback, useState } from 'react';
 import { usePasswordProtection } from './PasswordProtectContext';
@@ -47,7 +41,6 @@ export function PasswordProtect({
   } = usePasswordProtection();
 
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -132,7 +125,7 @@ export function PasswordProtect({
               size="sm"
               className="bg-background/90 backdrop-blur-sm border border-border/50"
             >
-              <EyeIcon className="mr-2 h-4 w-4" />
+              <HideIcon className="mr-2 h-4 w-4" />
               Show content
             </Button>
           </div>
@@ -163,23 +156,6 @@ export function PasswordProtect({
                   disabled={isLoading}
                   className={error ? 'border-red-500' : ''}
                 />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                  onClick={() => setShowPassword(!showPassword)}
-                  disabled={isLoading}
-                >
-                  {showPassword ? (
-                    <EyeOffIcon className="h-4 w-4" />
-                  ) : (
-                    <EyeIcon className="h-4 w-4" />
-                  )}
-                  <span className="sr-only">
-                    {showPassword ? 'Hide password' : 'Show password'}
-                  </span>
-                </Button>
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
             </div>

@@ -18,8 +18,8 @@ This project uses the following libraries
     - ShadCN
 - Icons
     - @radix-ui/react-icons
-    - lucide-react 
-
+    - lucide-react
+    - react-icons
 
 ### Shadcn
 - When adding a new component, use the command format `npx shadcn@latest add <component-name>`
@@ -31,6 +31,7 @@ In the latest Next.js app router, the `params` prop for top-level pages is now p
 
 ## Example
 ```ts
+// Always destructure and use `await params` in your top-level page components.
 export default async function MyComponent({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return (
@@ -39,4 +40,3 @@ export default async function MyComponent({ params }: { params: Promise<{ id: st
 }
 ```
 
-- Always destructure and use `await params` in your top-level page components.

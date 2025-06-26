@@ -4,7 +4,6 @@
     "esbenp.prettier-vscode",
     "bradlc.vscode-tailwindcss",
     "tht13.html-preview-vscode",
-    "christian-kohler.path-intellisense",
-    "stagewise.stagewise-vscode-extension"
+    "christian-kohler.path-intellisense"
   ]
 }

@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -33,6 +34,8 @@ interface AttendanceDialogProps {
   attendanceKey?: string;
   attendanceRecords: Doc<'attendanceRecords'>[];
   onSuccess?: () => void;
+  isManuallyJoined: boolean;
+  remarksPlaceholder?: string;
 }
 
 export function AttendanceDialog({
@@ -42,6 +45,8 @@ export function AttendanceDialog({
   attendanceKey,
   attendanceRecords,
   onSuccess,
+  isManuallyJoined,
+  remarksPlaceholder,
 }: AttendanceDialogProps) {
   const currentUser = useCurrentUser();
   const isAuthenticated = currentUser !== undefined;
@@ -63,8 +68,6 @@ export function AttendanceDialog({
       ? 'self'
       : 'other';
 
-  console.log({ isCurrentUserResponse, existingRecord, currentUser, defaultRespondAs });
-
   const [respondAs, setRespondAs] = useState<'self' | 'other'>(defaultRespondAs);
   const [status, setStatus] = useState<AttendanceStatus>(
     (existingRecord?.status as AttendanceStatus) || AttendanceStatus.ATTENDING
@@ -73,6 +76,7 @@ export function AttendanceDialog({
   const [remarks, setRemarks] = useState(existingRecord?.remarks || '');
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [enteredName, setEnteredName] = useState(personName || '');
 
   const recordAttendance = useSessionMutation(api.attendance.recordAttendance);
   const deleteAttendanceRecord = useSessionMutation(api.attendance.deleteAttendanceRecord);
@@ -91,30 +95,43 @@ export function AttendanceDialog({
     }
   }, [existingRecord]);
 
+  useEffect(() => {
+    setEnteredName(personName || '');
+  }, [personName]);
+
   const handleSubmit = useCallback(async () => {
+    const nameToUse = !isAuthenticated || !personName ? enteredName : personName;
+
+    if (!nameToUse.trim()) {
+      toast.error('Please enter your name');
+      return;
+    }
+
     setLoading(true);
 
     try {
       if (respondAs === 'self' && isAuthenticated) {
         await recordAttendance({
-          name: personName,
+          name: nameToUse,
           attendanceKey,
           status,
           reason: status === AttendanceStatus.NOT_ATTENDING ? reason : undefined,
           remarks: status === AttendanceStatus.ATTENDING ? remarks : undefined,
           self: true,
+          isManuallyJoined,
         });
         toast.success('Your attendance has been recorded');
       } else {
         await recordAttendance({
           attendanceKey,
-          name: personName,
+          name: nameToUse,
           status,
           reason: status === AttendanceStatus.NOT_ATTENDING ? reason : undefined,
           remarks: status === AttendanceStatus.ATTENDING ? remarks : undefined,
           self: false,
+          isManuallyJoined,
         });
-        toast.success(`Attendance recorded for ${personName}`);
+        toast.success(`Attendance recorded for ${nameToUse}`);
       }
 
       // Call onSuccess callback if provided
@@ -135,11 +152,13 @@ export function AttendanceDialog({
     onClose,
     onSuccess,
     personName,
+    enteredName,
     reason,
     recordAttendance,
     respondAs,
     status,
     remarks,
+    isManuallyJoined,
   ]);
 
   // Handle keyboard shortcuts
@@ -160,12 +179,14 @@ export function AttendanceDialog({
   const handleDelete = async () => {
     if (!existingRecord) return;
 
+    const nameToUse = !isAuthenticated || !personName ? enteredName : personName;
+
     setDeleteLoading(true);
     try {
       await deleteAttendanceRecord({
         recordId: existingRecord._id as Id<'attendanceRecords'>,
       });
-      toast.success(`Deleted attendance record for ${personName}`);
+      toast.success(`Deleted attendance record for ${nameToUse}`);
       onClose();
     } catch (error) {
       console.error('Failed to delete attendance record:', error);
@@ -191,13 +212,31 @@ export function AttendanceDialog({
           <DialogDescription className="text-sm opacity-80 mt-1">
             {isAuthenticated
               ? 'Record attendance for yourself or for someone else.'
-              : `Record attendance for ${personName}.`}
+              : personName
+                ? `Record attendance for ${personName}.`
+                : 'Enter your name and record your attendance.'}
           </DialogDescription>
         </DialogHeader>
         <div>
           <Separator className="mb-2" />
 
           <div className="space-y-2">
+            {/* Name input for anonymous users or when no name is provided */}
+            {(!isAuthenticated || !personName) && (
+              <div className="space-y-3 p-4 bg-muted/30 rounded-lg">
+                <Label htmlFor="name-input" className="text-sm font-medium">
+                  Your Name
+                </Label>
+                <Input
+                  id="name-input"
+                  value={enteredName}
+                  onChange={(e) => setEnteredName(e.target.value)}
+                  placeholder="Enter your name"
+                  className="w-full"
+                />
+              </div>
+            )}
+
             {isAuthenticated && (
               <div className="space-y-3 p-4 bg-muted/30 rounded-lg">
                 <Label htmlFor="respond-as" className="text-sm font-medium">
@@ -272,7 +311,7 @@ export function AttendanceDialog({
                     id="remarks"
                     value={remarks}
                     onChange={(e) => setRemarks(e.target.value)}
-                    placeholder="Any remarks or suggestions?"
+                    placeholder={remarksPlaceholder || 'Any remarks or suggestions?'}
                     rows={3}
                     className="resize-none"
                   />

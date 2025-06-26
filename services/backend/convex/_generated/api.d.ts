@@ -17,6 +17,7 @@ import type * as appinfo from "../appinfo.js";
 import type * as attendance from "../attendance.js";
 import type * as auth from "../auth.js";
 import type * as budgets from "../budgets.js";
+import type * as checklists from "../checklists.js";
 import type * as cleanupTasks from "../cleanupTasks.js";
 import type * as crypto from "../crypto.js";
 import type * as discussions from "../discussions.js";
@@ -40,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   attendance: typeof attendance;
   auth: typeof auth;
   budgets: typeof budgets;
+  checklists: typeof checklists;
   cleanupTasks: typeof cleanupTasks;
   crypto: typeof crypto;
   discussions: typeof discussions;

@@ -91,5 +91,11 @@ function generatePasswordHashForConsole(...args: string[]): Promise<string> {
 
 // Expose the function to the global window object for developer console use
 if (typeof window !== 'undefined') {
-  (window as any).generatePasswordHash = generatePasswordHashForConsole;
+  window.generatePasswordHash = generatePasswordHashForConsole;
+}
+
+declare global {
+  interface Window {
+    generatePasswordHash: typeof generatePasswordHashForConsole;
+  }
 }

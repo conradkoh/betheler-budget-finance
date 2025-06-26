@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface DiscussionFormProps {
   initialName?: string;
@@ -16,26 +16,40 @@ export function DiscussionForm({ initialName = '', onSubmit, onCancel }: Discuss
   const [name, setName] = useState(initialName);
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!name.trim() || !message.trim()) return;
-
-    setIsSubmitting(true);
-    try {
-      const success = await onSubmit(name, message);
-      if (success) {
-        // Clear message but keep name for future submissions
-        setMessage('');
+  const handleSubmit = useCallback(
+    async (e?: React.FormEvent) => {
+      if (e) {
+        e.preventDefault();
       }
-    } finally {
-      setIsSubmitting(false);
+
+      if (!name.trim() || !message.trim() || isSubmitting) return;
+
+      setIsSubmitting(true);
+      try {
+        const success = await onSubmit(name, message);
+        if (success) {
+          // Clear message but keep name for future submissions
+          setMessage('');
+        }
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [name, message, onSubmit, isSubmitting]
+  );
+
+  const handleTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Cmd/Ctrl + Enter to submit the form
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault();
+      handleSubmit();
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" ref={formRef}>
       <div className="space-y-2">
         <Label htmlFor="name">Your Name</Label>
         <Input
@@ -56,6 +70,7 @@ export function DiscussionForm({ initialName = '', onSubmit, onCancel }: Discuss
           placeholder="Share your thoughts..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={handleTextareaKeyDown}
           required
           disabled={isSubmitting}
           className="w-full min-h-[100px]"

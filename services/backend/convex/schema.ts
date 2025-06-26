@@ -1,12 +1,26 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 
-// DEPRECATION NOTICE: The fields `expiresAt` and `expiresAtLabel` in the sessions table are deprecated and no longer used for session expiry. They are only kept for migration compatibility and will be removed in a future migration.
-
+/**
+ * Database schema definition for the application.
+ * Defines all tables, their fields, and indexes for optimal querying.
+ *
+ * DEPRECATION NOTICE: The fields `expiresAt` and `expiresAtLabel` in the sessions table
+ * are deprecated and no longer used for session expiry. They are only kept for migration
+ * compatibility and will be removed in a future migration.
+ */
 export default defineSchema({
+  /**
+   * Application metadata and version tracking.
+   */
   appInfo: defineTable({
     latestVersion: v.string(),
   }),
+
+  /**
+   * Presentation state management for real-time presentation controls.
+   * Tracks current slide and active presenter information.
+   */
   presentationState: defineTable({
     key: v.string(), // The presentation key that identifies this presentation
     currentSlide: v.number(), // The current slide number
@@ -18,7 +32,10 @@ export default defineSchema({
     ), // Optional object containing presenter information
   }).index('by_key', ['key']),
 
-  // Discussion-related tables
+  /**
+   * Discussion state management for collaborative discussions.
+   * Tracks discussion lifecycle, conclusions, and metadata.
+   */
   discussionState: defineTable({
     key: v.string(), // Unique identifier for the discussion
     title: v.string(), // Title of the discussion
@@ -36,6 +53,10 @@ export default defineSchema({
     concludedBy: v.optional(v.string()), // Session ID of who concluded the discussion
   }).index('by_key', ['key']),
 
+  /**
+   * Individual messages within discussions.
+   * Stores message content, sender information, and timestamps.
+   */
   discussionMessages: defineTable({
     discussionKey: v.string(), // The discussion this message belongs to
     name: v.string(), // Name of the person who wrote the message
@@ -44,7 +65,40 @@ export default defineSchema({
     sessionId: v.optional(v.string()), // Session ID of the sender (optional)
   }).index('by_discussion', ['discussionKey']),
 
-  // Attendance-related tables
+  /**
+   * Checklist state management for collaborative task tracking.
+   * Tracks checklist lifecycle and metadata.
+   */
+  checklistState: defineTable({
+    key: v.string(), // Unique identifier for the checklist
+    title: v.string(), // Title of the checklist
+    isActive: v.boolean(), // Whether the checklist is active or concluded
+    createdAt: v.number(), // When the checklist was created
+    concludedAt: v.optional(v.number()), // When the checklist was concluded
+    concludedBy: v.optional(v.string()), // Session ID of who concluded the checklist
+  }).index('by_key', ['key']),
+
+  /**
+   * Individual items within checklists.
+   * Stores item content, completion status, ordering, and audit trail.
+   */
+  checklistItems: defineTable({
+    checklistKey: v.string(), // The checklist this item belongs to
+    text: v.string(), // The item text/description
+    isCompleted: v.boolean(), // Whether the item is completed
+    order: v.number(), // Display order
+    createdAt: v.number(), // When the item was created
+    completedAt: v.optional(v.number()), // When the item was completed
+    createdBy: v.optional(v.string()), // Session ID of who created the item
+    completedBy: v.optional(v.string()), // Session ID of who completed the item
+  })
+    .index('by_checklist', ['checklistKey'])
+    .index('by_checklist_order', ['checklistKey', 'order']),
+
+  /**
+   * Attendance tracking for events and meetings.
+   * Records attendance status, reasons, and participant information.
+   */
   attendanceRecords: defineTable({
     attendanceKey: v.string(), // The attendance session key (hardcoded)
     timestamp: v.number(), // When the attendance was recorded
@@ -53,12 +107,16 @@ export default defineSchema({
     status: v.optional(v.union(v.literal('attending'), v.literal('not_attending'))), // Attendance status
     reason: v.optional(v.string()), // Optional reason for not attending
     remarks: v.optional(v.string()), // Optional remarks for attending
+    isManuallyJoined: v.optional(v.boolean()), // Whether this person manually joined the list (vs being in expected list)
   })
     .index('by_attendance', ['attendanceKey'])
     .index('by_name_attendance', ['attendanceKey', 'name'])
     .index('by_user_attendance', ['attendanceKey', 'userId']),
 
-  // auth
+  /**
+   * User accounts supporting both authenticated and anonymous users.
+   * Stores user credentials, names, and recovery information.
+   */
   users: defineTable(
     v.union(
       v.object({
@@ -79,7 +137,10 @@ export default defineSchema({
     .index('by_email', ['email'])
     .index('by_name', ['name']),
 
-  //sessions
+  /**
+   * User sessions for authentication and state management.
+   * Links session IDs to user accounts with creation timestamps.
+   */
   sessions: defineTable({
     sessionId: v.string(), //this is provided by the client
     userId: v.id('users'), // null means session exists but not authenticated
@@ -124,6 +185,10 @@ export default defineSchema({
     .index('by_shareId', ['shareId'])
     .index('by_userId', ['userId']),
   //login codes for cross-device authentication
+  /**
+   * Temporary login codes for cross-device authentication.
+   * Stores time-limited codes for secure device-to-device login.
+   */
   loginCodes: defineTable({
     code: v.string(), // The 8-letter login code
     userId: v.id('users'), // The user who generated this code

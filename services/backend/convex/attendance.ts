@@ -15,6 +15,7 @@ export const recordAttendance = mutation({
     reason: v.optional(v.string()),
     remarks: v.optional(v.string()),
     self: v.optional(v.boolean()),
+    isManuallyJoined: v.boolean(),
     ...SessionIdArg,
   },
   handler: async (ctx, args) => {
@@ -22,6 +23,7 @@ export const recordAttendance = mutation({
     const name = args.name;
     const attendanceKey = args.attendanceKey || ATTENDANCE_KEY;
     const self = args.self ?? false;
+    const isManuallyJoined = args.isManuallyJoined;
 
     // For authenticated users
     const user = await getAuthUserOptional(ctx, args);
@@ -62,6 +64,7 @@ export const recordAttendance = mutation({
       status: args.status,
       reason: args.status === 'not_attending' ? args.reason : undefined,
       remarks: args.status === 'attending' ? args.remarks : undefined,
+      isManuallyJoined,
     });
   },
 });

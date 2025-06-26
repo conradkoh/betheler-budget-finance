@@ -57,6 +57,62 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* Mobile-responsive spacing and sizing variables */
+:root {
+  /* Base spacing (desktop) */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Base font sizes (desktop) */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+
+  /* Base component sizes (desktop) */
+  --button-height-sm: 2rem;
+  --button-height-md: 2.25rem;
+  --button-height-lg: 2.5rem;
+  --input-height: 2.25rem;
+  --header-height: 4rem;
+}
+
+/* Mobile overrides - more compact sizing */
+@media (max-width: 640px) {
+  :root {
+    /* Reduced spacing for mobile */
+    --spacing-xs: 0.125rem;
+    --spacing-sm: 0.25rem;
+    --spacing-md: 0.5rem;
+    --spacing-lg: 0.75rem;
+    --spacing-xl: 1rem;
+    --spacing-2xl: 1.5rem;
+
+    /* Smaller font sizes for mobile */
+    --text-xs: 0.625rem;
+    --text-sm: 0.75rem;
+    --text-base: 0.875rem;
+    --text-lg: 1rem;
+    --text-xl: 1.125rem;
+    --text-2xl: 1.25rem;
+    --text-3xl: 1.5rem;
+
+    /* Smaller component sizes for mobile */
+    --button-height-sm: 1.75rem;
+    --button-height-md: 2rem;
+    --button-height-lg: 2.25rem;
+    --input-height: 2rem;
+    --header-height: 3.5rem;
+  }
+}
+
 /* Add smooth transitions for theme changes */
 :root {
   --theme-transition-duration: 0.2s;
@@ -212,5 +268,73 @@ input,
   button:not([disabled]),
   [role="button"]:not([disabled]) {
     cursor: pointer;
+  }
+}
+
+/* Mobile-first utility classes for compact design */
+@layer utilities {
+  /* Responsive spacing utilities */
+  .space-mobile {
+    @apply space-y-2 sm:space-y-4;
+  }
+
+  .gap-mobile {
+    @apply gap-2 sm:gap-4;
+  }
+
+  .p-mobile {
+    @apply p-2 sm:p-4;
+  }
+
+  .px-mobile {
+    @apply px-2 sm:px-4;
+  }
+
+  .py-mobile {
+    @apply py-2 sm:py-4;
+  }
+
+  /* Responsive text utilities */
+  .text-mobile-xs {
+    @apply text-xs sm:text-sm;
+  }
+
+  .text-mobile-sm {
+    @apply text-sm sm:text-base;
+  }
+
+  .text-mobile-base {
+    @apply text-sm sm:text-lg;
+  }
+
+  .text-mobile-lg {
+    @apply text-base sm:text-xl;
+  }
+
+  .text-mobile-xl {
+    @apply text-lg sm:text-2xl;
+  }
+
+  /* Mobile-optimized component heights */
+  .h-mobile-button {
+    height: var(--button-height-md);
+  }
+
+  .h-mobile-input {
+    height: var(--input-height);
+  }
+
+  .h-mobile-header {
+    height: var(--header-height);
+  }
+
+  /* Compact card styling for mobile */
+  .card-mobile {
+    @apply p-3 sm:p-6 space-y-2 sm:space-y-4;
+  }
+
+  /* Mobile-optimized dialog/modal sizing */
+  .dialog-mobile {
+    @apply max-w-[95vw] sm:max-w-lg p-4 sm:p-6;
   }
 }
