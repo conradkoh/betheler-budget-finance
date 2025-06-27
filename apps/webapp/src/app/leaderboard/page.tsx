@@ -8,10 +8,15 @@ import { api } from '@workspace/backend/convex/_generated/api';
 import { useQuery } from 'convex/react';
 import { endOfMonth, startOfMonth } from 'date-fns';
 import { Calendar, Medal, Trophy, Users } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useMemo, useState } from 'react';
+
+type LeaderboardTab = 'transactions' | 'unique-days';
 
 export default function LeaderboardPage() {
   const authState = useAuthState();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Date range state for the leaderboard - default to current month
   const [selectedDateRange, setSelectedDateRange] = useState<DateRange>(() => {
@@ -22,8 +27,25 @@ export default function LeaderboardPage() {
     };
   });
 
-  // Tab state for switching between transaction count and unique days
-  const [activeTab, setActiveTab] = useState<'transactions' | 'unique-days'>('transactions');
+  // Get active tab from URL, defaulting to 'transactions'
+  const activeTab = useMemo((): LeaderboardTab => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'unique-days') {
+      return 'unique-days';
+    }
+    return 'transactions';
+  }, [searchParams]);
+
+  // Handle tab change with URL update
+  const handleTabChange = useCallback(
+    (value: string) => {
+      const newTab = value as LeaderboardTab;
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('tab', newTab);
+      router.push(`?${params.toString()}`, { scroll: false });
+    },
+    [router, searchParams]
+  );
 
   // Get the client's timezone offset in minutes
   const timezoneOffsetMinutes = useMemo(() => new Date().getTimezoneOffset(), []);
@@ -197,11 +219,7 @@ export default function LeaderboardPage() {
           </div>
         </div>
 
-        <Tabs
-          value={activeTab}
-          onValueChange={(value) => setActiveTab(value as 'transactions' | 'unique-days')}
-          className="w-full"
-        >
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="transactions" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
