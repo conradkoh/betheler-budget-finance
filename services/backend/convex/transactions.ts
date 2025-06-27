@@ -635,3 +635,63 @@ export const getPublicLeaderboardByDateRange = query({
     return leaderboardData.sort((a, b) => b.transactionCount - a.transactionCount);
   },
 });
+
+// Public leaderboard endpoint for unique days with transactions (doesn't require authentication)
+export const getPublicLeaderboardByUniqueDays = query({
+  args: {
+    startDateISO: v.string(),
+    endDateISO: v.string(),
+    timezoneOffsetMinutes: v.number(),
+  },
+  handler: async (ctx, args) => {
+    // Get the date range, adjusting for timezone
+    const { startDateISO, endDateISO } = getDateRange(
+      args.startDateISO,
+      args.endDateISO,
+      args.timezoneOffsetMinutes
+    );
+
+    // Get all users
+    const users = await ctx.db.query('users').collect();
+
+    // For each user, get their unique days with transactions for the date range
+    const leaderboardData = await Promise.all(
+      users.map(async (userData) => {
+        // Get transactions for this user within the specified date range
+        const transactions = await ctx.db
+          .query('transactions')
+          .withIndex('by_userId_datetime', (q) =>
+            q.eq('userId', userData._id).gte('datetime', startDateISO).lte('datetime', endDateISO)
+          )
+          .collect();
+
+        // Extract unique dates from transactions
+        const uniqueDates = new Set<string>();
+
+        for (const transaction of transactions) {
+          // Parse the transaction datetime and adjust for timezone
+          const transactionDate = new Date(transaction.datetime);
+
+          // Adjust for timezone offset (convert to user's local time)
+          const localDate = new Date(
+            transactionDate.getTime() - args.timezoneOffsetMinutes * 60 * 1000
+          );
+
+          // Get the date string in YYYY-MM-DD format
+          const dateString = localDate.toISOString().split('T')[0];
+
+          uniqueDates.add(dateString);
+        }
+
+        return {
+          userId: userData._id,
+          name: userData.name,
+          uniqueDaysCount: uniqueDates.size,
+        };
+      })
+    );
+
+    // Sort by unique days count (highest first)
+    return leaderboardData.sort((a, b) => b.uniqueDaysCount - a.uniqueDaysCount);
+  },
+});
