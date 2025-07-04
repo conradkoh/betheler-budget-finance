@@ -9,11 +9,29 @@ import { useQuery } from 'convex/react';
 import { endOfMonth, startOfMonth } from 'date-fns';
 import { Calendar, Medal, Trophy, Users } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useMemo, useState } from 'react';
+import { Suspense, useCallback, useMemo, useState } from 'react';
 
 type LeaderboardTab = 'transactions' | 'unique-days';
 
-export default function LeaderboardPage() {
+// Loading component for the suspense boundary
+function LeaderboardLoading() {
+  return (
+    <div className="container mx-auto px-4 py-6 sm:py-8">
+      <div className="max-w-5xl mx-auto">
+        <div className="mb-6 sm:mb-8 text-center">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2 flex items-center justify-center">
+            <Trophy className="h-8 w-8 text-yellow-500 dark:text-yellow-400 mr-2" />
+            Finance Tracking Leaderboard <span className="ml-2">👑</span>
+          </h1>
+          <p className="text-muted-foreground mb-6">Loading leaderboard...</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Component that uses useSearchParams - needs to be wrapped in Suspense
+function LeaderboardContent() {
   const authState = useAuthState();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -275,5 +293,14 @@ export default function LeaderboardPage() {
         </Tabs>
       </div>
     </div>
+  );
+}
+
+// Main component that wraps LeaderboardContent in Suspense
+export default function LeaderboardPage() {
+  return (
+    <Suspense fallback={<LeaderboardLoading />}>
+      <LeaderboardContent />
+    </Suspense>
   );
 }
