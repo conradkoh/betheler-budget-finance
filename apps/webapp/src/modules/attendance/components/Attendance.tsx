@@ -82,7 +82,7 @@ const _AttendanceContent = ({
   } = useAttendanceData({ attendanceKey, expectedNames });
 
   // Local component state
-  const [expanded, setExpanded] = useState<string | null>(null);
+  const [_expanded, _setExpanded] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPerson, setSelectedPerson] = useState<string>('');
   const [showFullListModal, setShowFullListModal] = useState(false);

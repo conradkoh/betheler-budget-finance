@@ -1,7 +1,7 @@
 'use client';
 
-import { Input } from '@/components/ui/input';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Input } from '@/components/ui/input';
 
 /**
  * Props for the ChecklistInlineInput component.

@@ -1,6 +1,7 @@
-import { SessionIdArg } from 'convex-helpers/server/sessions';
 import { ConvexError, v } from 'convex/values';
+import { SessionIdArg } from 'convex-helpers/server/sessions';
 import { getAuthUserOptional } from '../modules/auth/getAuthUser';
+import type { Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 
 // Hardcoded attendance key
@@ -19,7 +20,7 @@ export const recordAttendance = mutation({
     ...SessionIdArg,
   },
   handler: async (ctx, args) => {
-    let attendanceUserId = undefined; //the user id associated with the attendance record
+    let attendanceUserId: Id<'users'> | undefined; //the user id associated with the attendance record
     const name = args.name;
     const attendanceKey = args.attendanceKey || ATTENDANCE_KEY;
     const self = args.self ?? false;

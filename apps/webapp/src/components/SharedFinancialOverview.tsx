@@ -1,7 +1,5 @@
 'use client';
 
-import { formatCurrency } from '@/lib/formatCurrency';
-import { cn } from '@/lib/utils';
 import { api } from '@workspace/backend/convex/_generated/api';
 import { useQuery } from 'convex/react';
 import {
@@ -9,13 +7,13 @@ import {
   ArrowUpIcon,
   CoinsIcon,
   DollarSignIcon,
-  Loader2,
   PieChartIcon,
   PiggyBankIcon,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { formatCurrency } from '@/lib/formatCurrency';
+import { cn } from '@/lib/utils';
 import { SpendingBreakdownChart } from './CategoryPieChart';
-import { MonthYearPicker } from './MonthYearPicker';
 import { Skeleton } from './ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 

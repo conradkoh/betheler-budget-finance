@@ -1,3 +1,9 @@
+import { api } from '@workspace/backend/convex/_generated/api';
+import type { Doc, Id } from '@workspace/backend/convex/_generated/dataModel';
+import { useSessionMutation } from 'convex-helpers/react/sessions';
+import { Loader2, Trash2, UserCog, UserRound } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -19,12 +25,6 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/modules/auth/AuthProvider';
-import { api } from '@workspace/backend/convex/_generated/api';
-import type { Doc, Id } from '@workspace/backend/convex/_generated/dataModel';
-import { useSessionMutation } from 'convex-helpers/react/sessions';
-import { Loader2, Trash2, UserCog, UserRound } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
-import { toast } from 'sonner';
 import { AttendanceStatus } from '../types';
 
 interface AttendanceDialogProps {
@@ -38,6 +38,10 @@ interface AttendanceDialogProps {
   remarksPlaceholder?: string;
 }
 
+/**
+ * Dialog component for recording attendance with support for authenticated and anonymous users.
+ * Handles attendance status, reasons, remarks, and allows editing/deleting existing records.
+ */
 export function AttendanceDialog({
   isOpen,
   onClose,
@@ -82,7 +86,7 @@ export function AttendanceDialog({
   const deleteAttendanceRecord = useSessionMutation(api.attendance.deleteAttendanceRecord);
 
   useEffect(() => {
-    //automatically set the respond as to the default if the default changes
+    // Automatically set the respond as to the default if the default changes
     setRespondAs(defaultRespondAs);
   }, [defaultRespondAs]);
 
@@ -176,7 +180,7 @@ export function AttendanceDialog({
     };
   }, [handleSubmit]);
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     if (!existingRecord) return;
 
     const nameToUse = !isAuthenticated || !personName ? enteredName : personName;
@@ -194,7 +198,7 @@ export function AttendanceDialog({
     } finally {
       setDeleteLoading(false);
     }
-  };
+  }, [existingRecord, isAuthenticated, personName, enteredName, deleteAttendanceRecord, onClose]);
 
   // Check if current user can modify this record
   const canDelete =

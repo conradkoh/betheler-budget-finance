@@ -1,12 +1,10 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 import { Discussion } from '@/modules/discussion/discussion';
 import { PresentationContainer } from '@/modules/presentation/presentation-container';
-import { usePresentationContext } from '@/modules/presentation/presentation-container';
 import { PresentationControls } from '@/modules/presentation/presentation-controls';
 import { Slide } from '@/modules/presentation/slide';
-import { useState } from 'react';
 
 function PresentationContent() {
   return (

@@ -1,5 +1,5 @@
-import { SessionIdArg } from 'convex-helpers/server/sessions';
 import { v } from 'convex/values';
+import { SessionIdArg } from 'convex-helpers/server/sessions';
 import { mutation, query } from './_generated/server';
 
 // Get the current state of a discussion
@@ -180,7 +180,7 @@ export const getDiscussionsForPresentation = query({
     presentationKey: v.string(),
     ...SessionIdArg,
   },
-  handler: async (ctx, args) => {
+  handler: async (_ctx, _args) => {
     // This query is now deprecated
     return [];
   },

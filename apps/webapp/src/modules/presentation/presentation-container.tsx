@@ -1,17 +1,17 @@
 'use client';
 
-import { cn } from '@/lib/utils';
-import { usePresentationSync } from '@/modules/presentation/use-presentation-sync';
 import { useSearchParams } from 'next/navigation';
 import {
-  Suspense,
   createContext,
+  Suspense,
   useCallback,
   useContext,
   useEffect,
   useRef,
   useState,
 } from 'react';
+import { cn } from '@/lib/utils';
+import { usePresentationSync } from '@/modules/presentation/use-presentation-sync';
 
 type PresentationContextType = {
   isFullScreen: boolean;

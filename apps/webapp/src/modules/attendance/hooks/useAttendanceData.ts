@@ -1,12 +1,11 @@
+import { api } from '@workspace/backend/convex/_generated/api';
+import type { Doc } from '@workspace/backend/convex/_generated/dataModel';
 import { useSessionQuery } from 'convex-helpers/react/sessions';
 import { useRouter, useSearchParams } from 'next/navigation';
 // External imports
 import { useCallback, useEffect, useMemo, useState } from 'react';
-
 // Internal imports
 import { useCurrentUser } from '@/modules/auth/AuthProvider';
-import { api } from '@workspace/backend/convex/_generated/api';
-import type { Doc } from '@workspace/backend/convex/_generated/dataModel';
 
 /**
  * Props for the useAttendanceData hook.

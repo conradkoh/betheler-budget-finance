@@ -1,12 +1,12 @@
 'use client';
-import { formatCurrency } from '@/lib/formatCurrency';
 import { api } from '@workspace/backend/convex/_generated/api';
 import { useQuery } from 'convex/react';
-import { CalendarIcon, Loader2 } from 'lucide-react';
+import { CalendarIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { formatCurrency } from '@/lib/formatCurrency';
 import { MonthYearPicker } from './MonthYearPicker';
-import { ShareNotFound } from './ShareNotFound';
 import { SharedFinancialOverview } from './SharedFinancialOverview';
+import { ShareNotFound } from './ShareNotFound';
 import { TransactionItem } from './TransactionItem';
 import { Skeleton } from './ui/skeleton';
 
@@ -52,7 +52,7 @@ export function SharedTransactionView({ shareId }: SharedTransactionViewProps) {
     });
   }, [sharedTransactions]);
 
-  const total = useMemo(() => {
+  const _total = useMemo(() => {
     if (!sharedTransactions || sharedTransactions === null) return 0;
     return sharedTransactions.transactions.reduce((sum, tx) => sum + tx.amount, 0);
   }, [sharedTransactions]);

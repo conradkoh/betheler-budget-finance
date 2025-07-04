@@ -2,7 +2,7 @@ import { api } from '@workspace/backend/convex/_generated/api';
 import { useSessionQuery } from 'convex-helpers/react/sessions';
 import { format } from 'date-fns';
 import { Loader2, PlusIcon } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { BudgetForm } from './BudgetForm';
 import { BudgetItem } from './BudgetItem';
 import { EmptyBudgetState } from './EmptyBudgetState';

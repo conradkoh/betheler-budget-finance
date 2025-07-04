@@ -1,11 +1,11 @@
 'use client';
-import { Button } from '@/components/ui/button';
 import { api } from '@workspace/backend/convex/_generated/api';
 import type { Id } from '@workspace/backend/convex/_generated/dataModel';
 import { useSessionMutation } from 'convex-helpers/react/sessions';
 import { formatDistanceToNow } from 'date-fns';
 import { Calendar, Infinity as InfinityIcon, Link, Trash2 } from 'lucide-react';
 import { useCallback, useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 interface SharesListItemProps {
   share: {

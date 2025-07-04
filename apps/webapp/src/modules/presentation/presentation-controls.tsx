@@ -1,19 +1,11 @@
 'use client';
 
+import { Info, LinkIcon, Maximize2, Minimize2, MonitorSmartphone, UserIcon } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import {
-  Copy,
-  Info,
-  LinkIcon,
-  Maximize2,
-  Minimize2,
-  MonitorSmartphone,
-  UserIcon,
-} from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
 import { Button } from '../../components/ui/button';
 import { usePresentationContext } from './presentation-container';
 
@@ -46,11 +38,9 @@ export function PresentationControls() {
     nextSlide,
     isFullScreen,
     controlsVisible,
-    isSynced, // Whether sync mode is enabled (from URL param)
     toggleFullScreen,
     isPresenter, // Whether current user is the active presenter
     isPresentationActive, // Whether any presentation is active
-    isFollowing, // Whether viewer is following the presenter
     isSoloMode, // Whether viewer is navigating independently
     startPresenting,
     stopPresenting,
@@ -399,78 +389,77 @@ export function PresentationControls() {
                 </div>
 
                 {/* Sync Controls - Only shown when sync is enabled */}
-                <>
-                  {/* Role Display */}
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs text-muted-foreground">Role:</span>
-                    <span className="text-xs font-medium">
-                      {isPresenter ? 'Presenter' : isSoloMode ? 'Solo Viewer' : 'Viewer'}
-                    </span>
-                  </div>
 
-                  {/* Status Message - Different based on user role */}
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {isPresenter
-                      ? 'You are controlling the presentation for all viewers.'
-                      : isPresentationActive
-                        ? isSoloMode
-                          ? 'You are viewing independently. Click "Return to Presenter" to follow again.'
-                          : "You are following the presenter's slides."
-                        : 'No active presentation. Click "Start Presenting" to begin.'}
-                  </p>
+                {/* Role Display */}
+                <div className="flex items-center justify-between mt-2">
+                  <span className="text-xs text-muted-foreground">Role:</span>
+                  <span className="text-xs font-medium">
+                    {isPresenter ? 'Presenter' : isSoloMode ? 'Solo Viewer' : 'Viewer'}
+                  </span>
+                </div>
 
-                  {/* Button: Return to presenter - For viewers in solo mode */}
-                  {isPresentationActive && !isPresenter && isSoloMode && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={followPresenter}
-                      className="flex items-center gap-1 text-xs w-full mt-2 h-8"
-                    >
-                      <MonitorSmartphone className="h-3 w-3" />
-                      Return to presenter
-                    </Button>
-                  )}
+                {/* Status Message - Different based on user role */}
+                <p className="text-xs text-muted-foreground mt-1">
+                  {isPresenter
+                    ? 'You are controlling the presentation for all viewers.'
+                    : isPresentationActive
+                      ? isSoloMode
+                        ? 'You are viewing independently. Click "Return to Presenter" to follow again.'
+                        : "You are following the presenter's slides."
+                      : 'No active presentation. Click "Start Presenting" to begin.'}
+                </p>
 
-                  {/* Button: Become presenter - For viewers following presenter */}
-                  {isPresentationActive && !isPresenter && !isSoloMode && (
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={startPresenting}
-                      className="flex items-center gap-1 text-xs w-full mt-2 h-8"
-                    >
-                      <MonitorSmartphone className="h-3 w-3" />
-                      Become presenter
-                    </Button>
-                  )}
+                {/* Button: Return to presenter - For viewers in solo mode */}
+                {isPresentationActive && !isPresenter && isSoloMode && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={followPresenter}
+                    className="flex items-center gap-1 text-xs w-full mt-2 h-8"
+                  >
+                    <MonitorSmartphone className="h-3 w-3" />
+                    Return to presenter
+                  </Button>
+                )}
 
-                  {/* Button: Start presenting - When no presentation is active */}
-                  {!isPresenter && !isPresentationActive && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={startPresenting}
-                      className="flex items-center gap-1 text-xs w-full mt-2 h-8"
-                    >
-                      <MonitorSmartphone className="h-3 w-3" />
-                      Start presenting
-                    </Button>
-                  )}
+                {/* Button: Become presenter - For viewers following presenter */}
+                {isPresentationActive && !isPresenter && !isSoloMode && (
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={startPresenting}
+                    className="flex items-center gap-1 text-xs w-full mt-2 h-8"
+                  >
+                    <MonitorSmartphone className="h-3 w-3" />
+                    Become presenter
+                  </Button>
+                )}
 
-                  {/* Button: Stop presenting - For current presenter */}
-                  {isPresenter && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={stopPresenting}
-                      className="flex items-center gap-1 text-xs w-full mt-2 h-8"
-                    >
-                      <MonitorSmartphone className="h-3 w-3" />
-                      Stop presenting
-                    </Button>
-                  )}
-                </>
+                {/* Button: Start presenting - When no presentation is active */}
+                {!isPresenter && !isPresentationActive && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={startPresenting}
+                    className="flex items-center gap-1 text-xs w-full mt-2 h-8"
+                  >
+                    <MonitorSmartphone className="h-3 w-3" />
+                    Start presenting
+                  </Button>
+                )}
+
+                {/* Button: Stop presenting - For current presenter */}
+                {isPresenter && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={stopPresenting}
+                    className="flex items-center gap-1 text-xs w-full mt-2 h-8"
+                  >
+                    <MonitorSmartphone className="h-3 w-3" />
+                    Stop presenting
+                  </Button>
+                )}
 
                 <Button
                   variant="outline"

@@ -1,4 +1,3 @@
-import { formatCurrency } from '@/lib/formatCurrency';
 import { api } from '@workspace/backend/convex/_generated/api';
 import { useSessionQuery } from 'convex-helpers/react/sessions';
 import {
@@ -13,6 +12,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo } from 'react';
+import { formatCurrency } from '@/lib/formatCurrency';
 import { BudgetNavigationButton } from './BudgetNavigationButton';
 import { TransactionModal } from './TransactionModal';
 import { Button } from './ui/button';
@@ -329,10 +329,8 @@ export function MonthlySummaryCard({
   }
 
   return (
-    <>
-      <Card>
-        <CardContent className="pt-6">{content}</CardContent>
-      </Card>
-    </>
+    <Card>
+      <CardContent className="pt-6">{content}</CardContent>
+    </Card>
   );
 }

@@ -1,5 +1,5 @@
-import { cn } from '@/lib/utils';
 import { forwardRef, useState } from 'react';
+import { cn } from '@/lib/utils';
 import { Input } from './input';
 
 export interface NumberInputProps

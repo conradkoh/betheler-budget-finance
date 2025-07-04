@@ -1,7 +1,7 @@
-import { cn } from '@/lib/utils';
 import { format, set } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import * as React from 'react';
+import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
 import { Calendar } from './ui/calendar';
 import { Input } from './ui/input';
@@ -88,7 +88,7 @@ export function DateTimePicker({ value, onChange, className }: DateTimePickerPro
             selected={date}
             onSelect={handleDateSelect}
             initialFocus
-            disabled={(date) => {
+            disabled={(_date) => {
               // Example: Disable future dates
               // return date > new Date();
               return false;

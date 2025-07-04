@@ -1,10 +1,10 @@
-import { formatCurrency, parseCurrencyInput } from '@/lib/formatCurrency';
 import { api } from '@workspace/backend/convex/_generated/api';
 import type { Id } from '@workspace/backend/convex/_generated/dataModel';
 import { useSessionMutation, useSessionQuery } from 'convex-helpers/react/sessions';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { formatCurrency, parseCurrencyInput } from '@/lib/formatCurrency';
 import { CategorySelect } from './CategorySelect';
 import { Button } from './ui/button';
 import {
@@ -16,7 +16,7 @@ import {
   FormLabel,
   FormMessage,
 } from './ui/form';
-import { Input } from './ui/input';
+
 import { NumberInput } from './ui/number-input';
 
 interface BudgetFormProps {

@@ -1,12 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { BudgetBalanceSummary } from '@/components/BudgetBalanceSummary';
 import { BudgetList } from '@/components/BudgetList';
 import { MonthYearPicker } from '@/components/MonthYearPicker';
 import { PageHeader } from '@/components/PageHeader';
-import { useAuthState } from '@/modules/auth/AuthProvider';
 import { RequireLogin } from '@/modules/auth/RequireLogin';
-import { useState } from 'react';
 
 export default function BudgetsPage() {
   // Get current date for initial state

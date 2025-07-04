@@ -25,7 +25,7 @@ export const getAuthUserOptional = async (
 ) => {
   try {
     return await getAuthUser(ctx, args);
-  } catch (error) {
+  } catch (_error) {
     return null;
   }
 };

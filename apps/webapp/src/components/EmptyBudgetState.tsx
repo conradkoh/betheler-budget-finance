@@ -1,5 +1,4 @@
 import { CopyIcon, PlusIcon } from 'lucide-react';
-import Link from 'next/link';
 import { CopyBudgetButton } from './CopyBudgetButton';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';

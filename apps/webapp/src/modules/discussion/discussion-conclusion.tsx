@@ -1,5 +1,7 @@
 'use client';
 
+import { Plus, X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -9,8 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, X } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
 
 // Create a unique ID for each conclusion input
 const createId = () => `id-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
@@ -112,7 +112,7 @@ export function ConclusionForm({ onSubmit, onCancel, existingConclusion }: Concl
     setConclusions(conclusions.map((c) => (c.id === id ? { ...c, tag: value } : c)));
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, id: string) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, _id: string) => {
     // Cmd/Ctrl + Enter to submit the form
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       e.preventDefault();

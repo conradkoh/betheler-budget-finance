@@ -1,5 +1,4 @@
 'use client';
-import { Button } from '@/components/ui/button';
 import { api } from '@workspace/backend/convex/_generated/api';
 import { useSessionQuery } from 'convex-helpers/react/sessions';
 import { formatDistanceToNow } from 'date-fns';
@@ -12,6 +11,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useMemo } from 'react';
+import { Button } from '@/components/ui/button';
 
 export function RecentSharesList() {
   // Get all shares for the current user

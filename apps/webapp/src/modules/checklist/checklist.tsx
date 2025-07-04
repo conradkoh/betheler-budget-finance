@@ -1,5 +1,8 @@
 'use client';
 
+import type { Id } from '@workspace/backend/convex/_generated/dataModel';
+import { CheckCheck, GripVertical, Loader2, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -11,9 +14,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Progress } from '@/components/ui/progress';
-import type { Id } from '@workspace/backend/convex/_generated/dataModel';
-import { CheckCheck, GripVertical, Loader2, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ChecklistInlineInput } from './checklist-inline-input';
 import type { ChecklistItemWithOptimistic, ChecklistProps } from './types';
 import { useChecklistSync } from './use-checklist-sync';
@@ -116,14 +116,6 @@ export function Checklist({ title, checklistKey, description, className }: Check
     },
     [draggedItemId, reorderItems]
   );
-
-  /**
-   * Cleans up drag state when drag operation ends.
-   */
-  const handleDragEnd = useCallback(() => {
-    setDraggedItemId(null);
-    setDragOverIndex(null);
-  }, []);
 
   // Initialize checklist on mount
   useEffect(() => {
@@ -296,7 +288,7 @@ export function Checklist({ title, checklistKey, description, className }: Check
               </div>
             </div>
           ) : (
-            <div className="space-y-2">
+            <ul className="space-y-2">
               {items.map((item, index) => (
                 <_ChecklistItemComponent
                   key={item._id}
@@ -319,7 +311,7 @@ export function Checklist({ title, checklistKey, description, className }: Check
                   className="mt-3 px-1"
                 />
               )}
-            </div>
+            </ul>
           )}
         </div>
       </CardContent>
@@ -397,7 +389,7 @@ function _ChecklistItemComponent({
   }, [item.isCompleted, isPending]);
 
   return (
-    <div
+    <li
       className={itemClassName}
       draggable={canDrag}
       onDragStart={handleDragStart}
@@ -431,6 +423,6 @@ function _ChecklistItemComponent({
           </Button>
         )}
       </div>
-    </div>
+    </li>
   );
 }

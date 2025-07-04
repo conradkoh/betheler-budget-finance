@@ -1,3 +1,6 @@
+import type { Doc } from '@workspace/backend/convex/_generated/dataModel';
+import { Check, Copy } from 'lucide-react';
+import { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -9,9 +12,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useCurrentUser } from '@/modules/auth/AuthProvider';
-import type { Doc } from '@workspace/backend/convex/_generated/dataModel';
-import { Check, Copy } from 'lucide-react';
-import { useCallback, useState } from 'react';
 
 /**
  * Configuration options for copying attendance data.
@@ -47,8 +47,7 @@ export const AttendanceCopyDialog = ({
   allNames,
   attendanceMap,
 }: AttendanceCopyDialogProps) => {
-  const currentUser = useCurrentUser();
-  const isAuthenticated = currentUser !== undefined;
+  const _currentUser = useCurrentUser();
   const [copySuccess, setCopySuccess] = useState(false);
   const [copyOptions, setCopyOptions] = useState<CopyOptions>({
     includeRemarks: false,

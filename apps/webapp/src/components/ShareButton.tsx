@@ -1,9 +1,9 @@
-import { Button } from '@/components/ui/button';
 import { api } from '@workspace/backend/convex/_generated/api';
-import { useSessionId } from 'convex-helpers/react/sessions';
 import { useMutation } from 'convex/react';
+import { useSessionId } from 'convex-helpers/react/sessions';
 import { Share } from 'lucide-react';
 import { useCallback, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { ShareModal } from './ShareModal';
 
 interface ShareButtonProps {
@@ -63,7 +63,7 @@ export function ShareButton({ year, month, className }: ShareButtonProps) {
     [sessionId, createShareLink, year, month]
   );
 
-  const handleOpenModal = useCallback(() => {
+  const _handleOpenModal = useCallback(() => {
     setIsOpen(true);
   }, []);
 

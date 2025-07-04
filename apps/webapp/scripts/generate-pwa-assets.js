@@ -20,7 +20,7 @@ const pngToIco = require('png-to-ico');
 try {
   require.resolve('sharp');
   require.resolve('png-to-ico');
-} catch (e) {
+} catch (_e) {
   console.error('Required packages are missing. Please install them using:');
   console.error('pnpm add -D sharp png-to-ico');
   process.exit(1);

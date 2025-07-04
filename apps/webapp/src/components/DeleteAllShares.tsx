@@ -1,4 +1,8 @@
 'use client';
+import { api } from '@workspace/backend/convex/_generated/api';
+import { useSessionMutation } from 'convex-helpers/react/sessions';
+import { Trash2 } from 'lucide-react';
+import { useCallback, useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,10 +15,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { api } from '@workspace/backend/convex/_generated/api';
-import { useSessionMutation } from 'convex-helpers/react/sessions';
-import { Trash2 } from 'lucide-react';
-import { useCallback, useState } from 'react';
 
 interface DeleteAllSharesProps {
   variant?: 'default' | 'outline' | 'destructive' | 'secondary' | 'ghost' | 'link';

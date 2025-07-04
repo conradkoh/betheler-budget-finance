@@ -1,25 +1,36 @@
 'use client';
 
-import { UserMenu } from '@/components/UserMenu';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { useAuthState } from '@/modules/auth/AuthProvider';
 import { featureFlags } from '@workspace/backend/config/featureFlags';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
+import { UserMenu } from '@/components/UserMenu';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { useAuthState } from '@/modules/auth/AuthProvider';
 
+/**
+ * Main navigation header component with authentication state handling.
+ * Shows login button for unauthenticated users and user menu for authenticated users.
+ */
 export function Navigation() {
   const authState = useAuthState();
-  const isAuthenticated = authState?.state === 'authenticated';
-  const isLoading = authState === undefined;
+
+  /**
+   * Memoized authentication status to prevent unnecessary re-renders.
+   */
+  const authStatus = useMemo(() => {
+    const isAuthenticated = authState?.state === 'authenticated';
+    const isLoading = authState === undefined;
+    return { isAuthenticated, isLoading };
+  }, [authState]);
 
   const pathname = usePathname();
 
   // Memoize navigation items to prevent unnecessary recalculations
   const navItems = useMemo(
     () => [
-      ...(isAuthenticated
+      ...(authStatus.isAuthenticated
         ? [
             {
               href: '/app',
@@ -45,7 +56,7 @@ export function Navigation() {
           ]
         : []),
     ],
-    [pathname, isAuthenticated]
+    [pathname, authStatus.isAuthenticated]
   );
 
   // Memoize login button to prevent unnecessary re-renders
@@ -66,7 +77,7 @@ export function Navigation() {
         <div className="flex">
           {/* Link to /app (dashboard) instead of home page */}
           <Link
-            href={isAuthenticated ? '/app' : '/'}
+            href={authStatus.isAuthenticated ? '/app' : '/'}
             className="flex items-center whitespace-nowrap"
           >
             <span className="font-bold text-lg">Budget</span>
@@ -93,8 +104,8 @@ export function Navigation() {
 
           {/* User menu - visible on all screens */}
           <div>
-            {!isLoading &&
-              (isAuthenticated ? (
+            {!authStatus.isLoading &&
+              (authStatus.isAuthenticated ? (
                 <UserMenu showNameOnMobile={false} alignMenu="end" />
               ) : (
                 !featureFlags.disableLogin && loginButton
@@ -104,4 +115,29 @@ export function Navigation() {
       </div>
     </header>
   );
+}
+
+/**
+ * Renders the appropriate authentication section based on user state.
+ */
+function _renderAuthSection(isLoading: boolean, isAuthenticated: boolean) {
+  if (isLoading) {
+    return null;
+  }
+
+  if (isAuthenticated) {
+    return <UserMenu />;
+  }
+
+  if (!featureFlags.disableLogin) {
+    return (
+      <Link href="/login">
+        <Button size="sm" variant="outline">
+          Login
+        </Button>
+      </Link>
+    );
+  }
+
+  return null;
 }

@@ -114,7 +114,7 @@ export default defineSchema({
     .index('by_user_attendance', ['attendanceKey', 'userId']),
 
   /**
-   * User accounts supporting both authenticated and anonymous users.
+   * User accounts supporting authenticated, anonymous, and Google OAuth users.
    * Stores user credentials, names, and recovery information.
    */
   users: defineTable(
@@ -125,17 +125,33 @@ export default defineSchema({
         username: v.string(),
         email: v.string(),
         recoveryCode: v.optional(v.string()),
+        accessLevel: v.optional(v.union(v.literal('user'), v.literal('system_admin'))),
+        google: v.optional(
+          v.object({
+            id: v.string(),
+            email: v.string(),
+            verified_email: v.optional(v.boolean()),
+            name: v.string(),
+            given_name: v.optional(v.string()),
+            family_name: v.optional(v.string()),
+            picture: v.optional(v.string()),
+            locale: v.optional(v.string()),
+            hd: v.optional(v.string()),
+          })
+        ),
       }),
       v.object({
         type: v.literal('anonymous'),
         name: v.string(), //system generated name
         recoveryCode: v.optional(v.string()),
+        accessLevel: v.optional(v.union(v.literal('user'), v.literal('system_admin'))),
       })
     )
   )
     .index('by_username', ['username'])
     .index('by_email', ['email'])
-    .index('by_name', ['name']),
+    .index('by_name', ['name'])
+    .index('by_googleId', ['google.id']),
 
   /**
    * User sessions for authentication and state management.
@@ -145,6 +161,15 @@ export default defineSchema({
     sessionId: v.string(), //this is provided by the client
     userId: v.id('users'), // null means session exists but not authenticated
     createdAt: v.number(),
+    authMethod: v.optional(
+      v.union(
+        v.literal('google'), // Authenticated via Google OAuth
+        v.literal('login_code'), // Authenticated via login code
+        v.literal('recovery_code'), // Authenticated via recovery code
+        v.literal('anonymous'), // Anonymous session
+        v.literal('username_password') // Traditional username/password (for future use)
+      )
+    ), // How the user authenticated for this session
     expiresAt: v.optional(v.number()), // DEPRECATED: No longer used for session expiry. Kept for migration compatibility.
     expiresAtLabel: v.optional(v.string()), // DEPRECATED: No longer used for session expiry. Kept for migration compatibility.
   }).index('by_sessionId', ['sessionId']),
@@ -197,4 +222,19 @@ export default defineSchema({
     createdAt: v.number(), // When the code was created
     expiresAt: v.number(), // When the code expires (1 minute after creation)
   }).index('by_code', ['code']),
+
+  /**
+   * Third-party authentication configuration for dynamic auth provider setup.
+   * Supports multiple auth providers (Google, GitHub, etc.) with unified structure.
+   */
+  thirdPartyAuthConfig: defineTable({
+    type: v.union(v.literal('google')), // Auth provider type (extensible for future providers)
+    enabled: v.boolean(), // Whether this auth provider is enabled
+    projectId: v.optional(v.string()), // Google Cloud Project ID (optional, for convenience links)
+    clientId: v.optional(v.string()), // OAuth client ID
+    clientSecret: v.optional(v.string()), // OAuth client secret (encrypted storage recommended)
+    redirectUris: v.array(v.string()), // Allowed redirect URIs for OAuth
+    configuredBy: v.id('users'), // User who configured this (must be system_admin)
+    configuredAt: v.number(), // When this configuration was created/updated
+  }).index('by_type', ['type']),
 });

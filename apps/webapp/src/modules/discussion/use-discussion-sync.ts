@@ -45,13 +45,7 @@ type DiscussionConclusion = {
   _creationTime?: number;
 };
 
-export function useDiscussionSync({
-  key,
-  title,
-}: {
-  key: string;
-  title: string;
-}) {
+export function useDiscussionSync({ key, title }: { key: string; title: string }) {
   // Store user's name for messages
   const [userName, setUserName] = useState<string>('');
 

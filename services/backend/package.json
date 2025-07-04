@@ -15,7 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "convex": "^1.24.8",
-    "convex-helpers": "^0.1.91"
+    "convex-helpers": "^0.1.96"
   },
   "devDependencies": {
     "@edge-runtime/vm": "^5.0.0",

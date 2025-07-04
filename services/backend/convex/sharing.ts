@@ -1,7 +1,6 @@
-import { SessionIdArg } from 'convex-helpers/server/sessions';
 import { v } from 'convex/values';
+import { SessionIdArg } from 'convex-helpers/server/sessions';
 import { getAuthUser } from '../modules/auth/getAuthUser';
-import { api } from './_generated/api';
 import type { Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { getMonthDateRange } from './utils';

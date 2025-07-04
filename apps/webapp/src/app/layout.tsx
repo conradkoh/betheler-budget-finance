@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+import { ConvexQueryCacheProvider } from 'convex-helpers/react/cache/provider';
 import { ConvexClientProvider } from '@/app/ConvexClientProvider';
 import { Navigation } from '@/components/Navigation';
 import { Toaster } from '@/components/ui/sonner';
+import { AppInfoProvider } from '@/modules/app/AppInfoProvider';
 import { AuthProvider } from '@/modules/auth/AuthProvider';
 import { ThemeProvider } from '@/modules/theme/ThemeProvider';
-import type { Theme } from '@/modules/theme/theme-utils';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -39,6 +40,10 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Root layout component that wraps the entire application with providers and global structure.
+ * Sets up authentication, theming, navigation, and toast notifications for all pages.
+ */
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -56,14 +61,18 @@ export default function RootLayout({
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ConvexClientProvider>
-          <AuthProvider>
-            <ThemeProvider>
-              <div className="flex flex-col h-screen overflow-hidden">
-                <Navigation />
-                <main className="flex-1 flex flex-col overflow-scroll">{children}</main>
-              </div>
-            </ThemeProvider>
-          </AuthProvider>
+          <ConvexQueryCacheProvider>
+            <AppInfoProvider>
+              <AuthProvider>
+                <ThemeProvider>
+                  <div className="flex flex-col h-screen overflow-hidden">
+                    <Navigation />
+                    <main className="flex-1 flex flex-col overflow-scroll">{children}</main>
+                  </div>
+                </ThemeProvider>
+              </AuthProvider>
+            </AppInfoProvider>
+          </ConvexQueryCacheProvider>
         </ConvexClientProvider>
         <Toaster />
       </body>

@@ -1,5 +1,18 @@
 'use client';
 
+import type { Id } from '@workspace/backend/convex/_generated/dataModel';
+import {
+  Check,
+  Edit,
+  Loader2,
+  MessageCircle,
+  MoreHorizontal,
+  MoreVertical,
+  Plus,
+  RefreshCw,
+  Trash,
+} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,19 +31,6 @@ import {
 import { ConclusionForm } from '@/modules/discussion/discussion-conclusion';
 import { DiscussionForm } from '@/modules/discussion/discussion-form';
 import { useDiscussionSync } from '@/modules/discussion/use-discussion-sync';
-import type { Id } from '@workspace/backend/convex/_generated/dataModel';
-import {
-  Check,
-  Edit,
-  Loader2,
-  MessageCircle,
-  MoreHorizontal,
-  MoreVertical,
-  Plus,
-  RefreshCw,
-  Trash,
-} from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
 
 interface DiscussionProps {
   title: string;

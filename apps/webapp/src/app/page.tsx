@@ -1,9 +1,9 @@
 'use client';
-import { Button } from '@/components/ui/button';
 import { api } from '@workspace/backend/convex/_generated/api';
 import { useQuery } from 'convex/react';
 import { LucideBarChart, LucideUsers } from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default function Home() {
   const appInfo = useQuery(api.appinfo.get);

@@ -1,18 +1,11 @@
-import { formatCurrency } from '@/lib/formatCurrency';
 import { api } from '@workspace/backend/convex/_generated/api';
 import type { Doc } from '@workspace/backend/convex/_generated/dataModel';
 import { useSessionQuery } from 'convex-helpers/react/sessions';
-import { Loader2 } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
-import { MonthYearPicker } from './MonthYearPicker';
-import { TransactionForm } from './TransactionForm';
 import { TransactionItem } from './TransactionItem';
-import { type TransactionType, TransactionTypeSelect } from './TransactionTypeSelect';
-import { Button } from './ui/button';
-import { Card } from './ui/card';
+import type { TransactionType } from './TransactionTypeSelect';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Skeleton } from './ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
 interface TransactionListProps {
   year: number;

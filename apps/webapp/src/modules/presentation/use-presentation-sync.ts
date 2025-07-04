@@ -42,7 +42,7 @@ export function usePresentationSync({
   const prevPresentationActiveRef = useRef<boolean | null>(null);
 
   // Convert UI slide (1-based) to API slide (0-based)
-  const apiSlide = currentSlide - 1;
+  const _apiSlide = currentSlide - 1;
 
   // Get URL parameters to check sync status
   const searchParams = useSearchParams();

@@ -1,11 +1,11 @@
 'use client';
 
-import { formatCurrency } from '@/lib/formatCurrency';
 import { api } from '@workspace/backend/convex/_generated/api';
 import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js';
 import { useSessionQuery } from 'convex-helpers/react/sessions';
 import { useMemo } from 'react';
 import { Pie } from 'react-chartjs-2';
+import { formatCurrency } from '@/lib/formatCurrency';
 
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend);

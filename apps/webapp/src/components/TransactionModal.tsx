@@ -1,6 +1,5 @@
 'use client';
 
-import { X } from 'lucide-react';
 import { useState } from 'react';
 import { TransactionForm } from './TransactionForm';
 import { Button } from './ui/button';

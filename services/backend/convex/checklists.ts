@@ -1,6 +1,6 @@
-import { SessionIdArg } from 'convex-helpers/server/sessions';
 import { v } from 'convex/values';
-import { type MutationCtx, type QueryCtx, mutation, query } from './_generated/server';
+import { SessionIdArg } from 'convex-helpers/server/sessions';
+import { type MutationCtx, mutation, type QueryCtx, query } from './_generated/server';
 
 /**
  * Internal type for checklist update data when toggling completion status.
@@ -169,7 +169,7 @@ export const toggleChecklistItem = mutation({
     }
 
     // Check if the checklist is still active
-    const checklist = await _getActiveChecklist(ctx, item.checklistKey);
+    const _checklist = await _getActiveChecklist(ctx, item.checklistKey);
 
     // Toggle the completion status
     const updateData = _buildToggleUpdateData(!item.isCompleted, args.sessionId);

@@ -2,7 +2,6 @@
 import { api } from '@workspace/backend/convex/_generated/api';
 import { useSessionQuery } from 'convex-helpers/react/sessions';
 import { Loader2 } from 'lucide-react';
-import { useCallback, useState } from 'react';
 import { SharesListItem } from './SharesListItem';
 
 export function SharesList() {

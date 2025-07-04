@@ -1,15 +1,15 @@
 'use client';
 
-import { type DateRange, DateRangePicker } from '@/components/DateRangePicker';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAuthState } from '@/modules/auth/AuthProvider';
 import { api } from '@workspace/backend/convex/_generated/api';
 import { useQuery } from 'convex/react';
 import { endOfMonth, startOfMonth } from 'date-fns';
 import { Calendar, Medal, Trophy, Users } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useCallback, useMemo, useState } from 'react';
+import { type DateRange, DateRangePicker } from '@/components/DateRangePicker';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuthState } from '@/modules/auth/AuthProvider';
 
 type LeaderboardTab = 'transactions' | 'unique-days';
 
@@ -98,8 +98,8 @@ function LeaderboardContent() {
 
   // Function to render leaderboard content
   const renderLeaderboard = (
-    data: Array<{ userId: string; name: string; [key: string]: any }>,
-    metricName: string,
+    data: Array<{ userId: string; name: string; [key: string]: string | number }>,
+    _metricName: string,
     metricKey: string,
     isLoading: boolean
   ) => {

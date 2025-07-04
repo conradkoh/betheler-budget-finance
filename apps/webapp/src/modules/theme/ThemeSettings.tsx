@@ -1,10 +1,10 @@
 'use client';
 
+import { Laptop, Moon, Sun } from 'lucide-react';
+import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useTheme } from '@/modules/theme/ThemeProvider';
-import { Laptop, Moon, Sun } from 'lucide-react';
-import { toast } from 'sonner';
 
 export function ThemeSettings() {
   const { theme, setTheme } = useTheme();
