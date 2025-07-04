@@ -1,7 +1,37 @@
+import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { GoogleConnectCallback } from './components/GoogleConnectCallback';
 
-export default function GoogleConnectCallbackPage() {
+interface GoogleConnectCallbackPageProps {
+  searchParams: Promise<{
+    code?: string;
+    state?: string;
+    error?: string;
+    error_description?: string;
+  }>;
+}
+
+export default async function GoogleConnectCallbackPage({
+  searchParams,
+}: GoogleConnectCallbackPageProps) {
+  const params = await searchParams;
+
+  // Handle OAuth errors immediately on the server
+  if (params.error) {
+    const errorMessage =
+      params.error === 'access_denied'
+        ? 'Google sign-in was cancelled'
+        : `Google OAuth error: ${params.error}${params.error_description ? ` - ${params.error_description}` : ''}`;
+
+    // Redirect to profile with error
+    redirect(`/app/profile?error=${encodeURIComponent(errorMessage)}`);
+  }
+
+  // Validate required parameters
+  if (!params.code || !params.state) {
+    redirect(`/app/profile?error=${encodeURIComponent('Missing OAuth parameters')}`);
+  }
+
   return (
     <Suspense
       fallback={
@@ -20,7 +50,7 @@ export default function GoogleConnectCallbackPage() {
         </div>
       }
     >
-      <GoogleConnectCallback />
+      <GoogleConnectCallback code={params.code} state={params.state} />
     </Suspense>
   );
 }

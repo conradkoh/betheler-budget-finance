@@ -1,7 +1,32 @@
+import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { GoogleCallback } from '../components/GoogleCallback';
 
-export default function GoogleCallbackPage() {
+interface GoogleCallbackPageProps {
+  searchParams: Promise<{
+    code?: string;
+    state?: string;
+    error?: string;
+    error_description?: string;
+  }>;
+}
+
+export default async function GoogleCallbackPage({ searchParams }: GoogleCallbackPageProps) {
+  const params = await searchParams;
+
+  // Handle OAuth errors immediately on the server
+  if (params.error) {
+    console.error('OAuth error:', params.error, params.error_description);
+    // Redirect to login - user will see error there if needed
+    redirect('/login');
+  }
+
+  // Validate required parameters
+  if (!params.code || !params.state) {
+    console.error('Missing OAuth parameters');
+    redirect('/login');
+  }
+
   return (
     <Suspense
       fallback={
@@ -13,14 +38,14 @@ export default function GoogleCallbackPage() {
               </div>
               <div className="space-y-2">
                 <h1 className="text-2xl font-semibold text-gray-900">Loading...</h1>
-                <p className="text-gray-600">Preparing Google authentication...</p>
+                <p className="text-gray-600">Completing Google authentication...</p>
               </div>
             </div>
           </div>
         </div>
       }
     >
-      <GoogleCallback />
+      <GoogleCallback code={params.code} state={params.state} />
     </Suspense>
   );
 }

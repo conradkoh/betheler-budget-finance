@@ -122,7 +122,7 @@ export default defineSchema({
       v.object({
         type: v.literal('full'),
         name: v.string(),
-        username: v.string(),
+        username: v.optional(v.string()),
         email: v.string(),
         recoveryCode: v.optional(v.string()),
         accessLevel: v.optional(v.union(v.literal('user'), v.literal('system_admin'))),

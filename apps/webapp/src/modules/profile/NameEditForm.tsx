@@ -2,7 +2,8 @@
 
 import { ChevronDownIcon } from '@radix-ui/react-icons';
 import { api } from '@workspace/backend/convex/_generated/api';
-import { useSessionMutation, useSessionQuery } from 'convex-helpers/react/sessions';
+import { useQuery } from 'convex/react';
+import { useSessionMutation } from 'convex-helpers/react/sessions';
 import { X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -52,7 +53,7 @@ export function NameEditForm() {
   const authMethod = authState?.state === 'authenticated' ? authState.authMethod : undefined;
 
   // Get Google auth availability
-  const googleAuthAvailable = useSessionQuery(api.system.thirdPartyAuthConfig.getGoogleAuthConfig);
+  const googleAuthAvailable = useQuery(api.auth.google.getConfig);
   const isGoogleAuthAvailable = googleAuthAvailable?.enabled ?? false;
 
   // State for editing
@@ -132,8 +133,7 @@ export function NameEditForm() {
     setIsConnectingGoogle(true);
     try {
       const state = _generateState();
-      sessionStorage.setItem('google_oauth_connect_in_progress', 'true');
-      sessionStorage.setItem('google_oauth_state', state);
+      sessionStorage.setItem('google_oauth_connect_state', state);
 
       const redirectUri = `${window.location.origin}/app/profile/connect/google/callback`;
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchParams({

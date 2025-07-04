@@ -15,6 +15,7 @@ import type {
 } from "convex/server";
 import type * as appinfo from "../appinfo.js";
 import type * as attendance from "../attendance.js";
+import type * as auth_google from "../auth/google.js";
 import type * as auth from "../auth.js";
 import type * as budgets from "../budgets.js";
 import type * as checklists from "../checklists.js";
@@ -41,6 +42,7 @@ import type * as utils from "../utils.js";
 declare const fullApi: ApiFromModules<{
   appinfo: typeof appinfo;
   attendance: typeof attendance;
+  "auth/google": typeof auth_google;
   auth: typeof auth;
   budgets: typeof budgets;
   checklists: typeof checklists;

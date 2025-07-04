@@ -3,8 +3,9 @@
 import { featureFlags } from '@workspace/backend/config/featureFlags';
 import { AlertCircle, ChevronRight, KeyRound, KeySquare, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { useGoogleAuthAvailable } from '@/modules/app/useAppInfo';
 import { AnonymousLoginButton } from '@/modules/auth/AnonymousLoginButton';
@@ -17,6 +18,7 @@ import { GoogleLoginButton } from '@/modules/auth/GoogleLoginButton';
  */
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const authState = useAuthState();
   const googleAuthAvailable = useGoogleAuthAvailable();
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -28,6 +30,18 @@ export default function LoginPage() {
   const redirectAuthenticated = useCallback(() => {
     router.push('/app');
   }, [router]);
+
+  // Handle error messages from OAuth redirects
+  useEffect(() => {
+    const error = searchParams.get('error');
+    if (error) {
+      toast.error(decodeURIComponent(error));
+      // Clear the error from URL without causing a page reload
+      const url = new URL(window.location.href);
+      url.searchParams.delete('error');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, [searchParams]);
 
   // Get session ID for anonymous login - moved to useEffect to avoid hydration mismatch
   useEffect(() => {

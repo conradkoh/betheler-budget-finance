@@ -5,7 +5,8 @@ import { useAction } from 'convex/react';
 import { useSessionId } from 'convex-helpers/react/sessions';
 import { CopyIcon, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import {
   AlertDialog,
@@ -30,10 +31,23 @@ import { ThemeSettings } from '@/modules/theme/ThemeSettings';
  */
 export default function ProfilePage() {
   const authState = useAuthState();
+  const searchParams = useSearchParams();
 
   const isAuthenticated = useMemo(() => {
     return authState?.state === 'authenticated' && !!authState?.user;
   }, [authState]);
+
+  // Handle error messages from OAuth redirects
+  useEffect(() => {
+    const error = searchParams.get('error');
+    if (error) {
+      toast.error(decodeURIComponent(error));
+      // Clear the error from URL without causing a page reload
+      const url = new URL(window.location.href);
+      url.searchParams.delete('error');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, [searchParams]);
 
   if (!isAuthenticated) {
     return (
