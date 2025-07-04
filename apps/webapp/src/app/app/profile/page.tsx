@@ -6,7 +6,7 @@ import { useSessionId } from 'convex-helpers/react/sessions';
 import { CopyIcon, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import {
   AlertDialog,
@@ -27,15 +27,10 @@ import { NameEditForm } from '@/modules/profile/NameEditForm';
 import { ThemeSettings } from '@/modules/theme/ThemeSettings';
 
 /**
- * Displays the user profile page with account management, theme settings, and recovery options.
+ * Component that handles search params with proper error handling
  */
-export default function ProfilePage() {
-  const authState = useAuthState();
+function SearchParamsHandler() {
   const searchParams = useSearchParams();
-
-  const isAuthenticated = useMemo(() => {
-    return authState?.state === 'authenticated' && !!authState?.user;
-  }, [authState]);
 
   // Handle error messages from OAuth redirects
   useEffect(() => {
@@ -48,6 +43,19 @@ export default function ProfilePage() {
       window.history.replaceState({}, '', url.toString());
     }
   }, [searchParams]);
+
+  return null; // This component only handles side effects
+}
+
+/**
+ * Displays the user profile page with account management, theme settings, and recovery options.
+ */
+function ProfilePageContent() {
+  const authState = useAuthState();
+
+  const isAuthenticated = useMemo(() => {
+    return authState?.state === 'authenticated' && !!authState?.user;
+  }, [authState]);
 
   if (!isAuthenticated) {
     return (
@@ -84,6 +92,41 @@ export default function ProfilePage() {
         <_RecoveryCodeSection />
       </div>
     </div>
+  );
+}
+
+/**
+ * Loading state for the profile page
+ */
+function ProfilePageLoading() {
+  return (
+    <div className="container max-w-2xl mx-auto p-4">
+      <div className="animate-pulse space-y-6">
+        <div>
+          <div className="h-8 bg-muted rounded w-32 mb-2" />
+          <div className="h-4 bg-muted rounded w-64 mb-6" />
+        </div>
+        <div className="border-t pt-6">
+          <div className="h-6 bg-muted rounded w-48 mb-4" />
+          <div className="space-y-4">
+            <div className="h-16 bg-muted rounded" />
+            <div className="h-16 bg-muted rounded" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Main profile page component with Suspense boundary
+ */
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={<ProfilePageLoading />}>
+      <SearchParamsHandler />
+      <ProfilePageContent />
+    </Suspense>
   );
 }
 

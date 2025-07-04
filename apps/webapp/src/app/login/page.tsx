@@ -4,7 +4,7 @@ import { featureFlags } from '@workspace/backend/config/featureFlags';
 import { AlertCircle, ChevronRight, KeyRound, KeySquare, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { useGoogleAuthAvailable } from '@/modules/app/useAppInfo';
@@ -13,23 +13,10 @@ import { useAuthState } from '@/modules/auth/AuthProvider';
 import { GoogleLoginButton } from '@/modules/auth/GoogleLoginButton';
 
 /**
- * Login page component providing multiple authentication options.
- * Includes Google OAuth, code-based login, and anonymous access.
+ * Component that handles search params with proper error handling
  */
-export default function LoginPage() {
-  const router = useRouter();
+function SearchParamsHandler() {
   const searchParams = useSearchParams();
-  const authState = useAuthState();
-  const googleAuthAvailable = useGoogleAuthAvailable();
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const isLoading = authState === undefined;
-
-  /**
-   * Redirects authenticated users to the main application.
-   */
-  const redirectAuthenticated = useCallback(() => {
-    router.push('/app');
-  }, [router]);
 
   // Handle error messages from OAuth redirects
   useEffect(() => {
@@ -42,6 +29,27 @@ export default function LoginPage() {
       window.history.replaceState({}, '', url.toString());
     }
   }, [searchParams]);
+
+  return null; // This component only handles side effects
+}
+
+/**
+ * Login page component providing multiple authentication options.
+ * Includes Google OAuth, code-based login, and anonymous access.
+ */
+function LoginPageContent() {
+  const router = useRouter();
+  const authState = useAuthState();
+  const googleAuthAvailable = useGoogleAuthAvailable();
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const isLoading = authState === undefined;
+
+  /**
+   * Redirects authenticated users to the main application.
+   */
+  const redirectAuthenticated = useCallback(() => {
+    router.push('/app');
+  }, [router]);
 
   // Get session ID for anonymous login - moved to useEffect to avoid hydration mismatch
   useEffect(() => {
@@ -65,6 +73,18 @@ export default function LoginPage() {
   }
 
   return _renderLoginForm(googleAuthAvailable, sessionId);
+}
+
+/**
+ * Main login page component with Suspense boundary
+ */
+export default function LoginPage() {
+  return (
+    <Suspense fallback={_renderLoadingState()}>
+      <SearchParamsHandler />
+      <LoginPageContent />
+    </Suspense>
+  );
 }
 
 // 5. Internal helper functions
