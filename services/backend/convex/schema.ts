@@ -157,7 +157,9 @@ export default defineSchema({
     datetime: v.string(),
     description: v.string(),
     transactionType: v.union(v.literal('expense'), v.literal('income'), v.literal('savings')),
-  }).index('by_userId_datetime', ['userId', 'datetime']),
+  })
+    .index('by_userId_datetime', ['userId', 'datetime'])
+    .index('by_userId', ['userId']),
 
   //budgets
   budgets: defineTable({

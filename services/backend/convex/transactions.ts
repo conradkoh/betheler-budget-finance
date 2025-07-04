@@ -651,26 +651,40 @@ export const getPublicLeaderboardByUniqueDays = query({
       args.timezoneOffsetMinutes
     );
 
+    // Convert ISO strings to timestamps for _creationTime comparison
+    // Apply timezone offset to the boundaries to ensure we're filtering correctly
+    const startDate = new Date(startDateISO);
+    const endDate = new Date(endDateISO);
+
+    // Adjust the boundaries by the timezone offset
+    // Note: timezoneOffsetMinutes is positive for timezones behind UTC, negative for ahead
+    const startTimestamp = startDate.getTime() + args.timezoneOffsetMinutes * 60 * 1000;
+    const endTimestamp = endDate.getTime() + args.timezoneOffsetMinutes * 60 * 1000;
+
     // Get all users
     const users = await ctx.db.query('users').collect();
 
     // For each user, get their unique days with transactions for the date range
     const leaderboardData = await Promise.all(
       users.map(async (userData) => {
-        // Get transactions for this user within the specified date range
+        // Get transactions for this user and filter by _creationTime
         const transactions = await ctx.db
           .query('transactions')
-          .withIndex('by_userId_datetime', (q) =>
-            q.eq('userId', userData._id).gte('datetime', startDateISO).lte('datetime', endDateISO)
+          .withIndex('by_userId', (q) => q.eq('userId', userData._id))
+          .filter((q) =>
+            q.and(
+              q.gte(q.field('_creationTime'), startTimestamp),
+              q.lte(q.field('_creationTime'), endTimestamp)
+            )
           )
           .collect();
 
-        // Extract unique dates from transactions
+        // Extract unique dates from transactions using _creationTime
         const uniqueDates = new Set<string>();
 
         for (const transaction of transactions) {
-          // Parse the transaction datetime and adjust for timezone
-          const transactionDate = new Date(transaction.datetime);
+          // Parse the transaction _creationTime and adjust for timezone
+          const transactionDate = new Date(transaction._creationTime);
 
           // Adjust for timezone offset (convert to user's local time)
           const localDate = new Date(
