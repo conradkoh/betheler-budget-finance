@@ -1,0 +1,62 @@
+# Sample MDX Component
+
+This is a **standalone MDX file** that demonstrates clean, GitHub-style markdown rendering.
+
+## Features Demonstrated
+
+- Clean typography with proper spacing
+- **Bold** and *italic* text without over-styling
+- Lists with consistent spacing
+- Code blocks with clean syntax highlighting
+- Professional blockquotes
+
+### Code Example
+
+```typescript
+// TypeScript interface example
+interface MDXProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+// Component example with clean formatting
+export function MDXWrapper({ children, className }: MDXProps) {
+  return <div className={className}>{children}</div>;
+}
+
+// No more weird bold text in code blocks!
+const cleanCode = "properly formatted";
+```
+
+### Lists
+
+1. First ordered item with proper spacing
+2. Second ordered item
+3. Third ordered item
+
+Unordered list:
+- Clean bullet point one
+- Clean bullet point two  
+- Clean bullet point three
+
+### Links and Quotes
+
+> This blockquote demonstrates clean styling without italic text, following GitHub's modern approach. It has a subtle background and clean border styling.
+
+Visit the [home page](/) to see more examples with clean link styling.
+
+### Inline Elements
+
+Here's some text with `inline code` that's not bold and **bold formatting** that's appropriately weighted.
+
+### Tables
+
+| Feature      | Before       | After         |
+| ------------ | ------------ | ------------- |
+| Code blocks  | Bold text    | Clean text    |
+| Blockquotes  | Italic       | Clean         |
+| Typography   | Inconsistent | GitHub-style  |
+
+---
+
+*This MDX file showcases the improved styling with clean, modern typography that follows GitHub's markdown conventions.*

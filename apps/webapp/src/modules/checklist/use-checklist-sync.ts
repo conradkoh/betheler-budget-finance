@@ -137,7 +137,6 @@ export function useChecklistSync({ key, title }: UseChecklistSyncProps) {
   // Clean up optimistic toggles when server data changes (remove IDs that no longer exist or match server state)
   useEffect(() => {
     if (serverItems && optimisticToggles.size > 0) {
-      const _serverItemIds = new Set(serverItems.map((item) => item._id));
       setOptimisticToggles((prev) => {
         const newMap = new Map<Id<'checklistItems'>, boolean>();
         for (const [id, optimisticState] of prev) {

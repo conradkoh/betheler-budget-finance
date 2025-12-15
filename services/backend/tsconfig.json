@@ -2,7 +2,14 @@
   "extends": "./convex/tsconfig.json",
   "compilerOptions": {
     "rootDir": ".",
-    "outDir": "dist"
+    "outDir": "dist",
+    "composite": true,
+    "declaration": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
   },
-  "include": ["**/*.ts", "**/*.tsx"]
+  "include": ["config/**/*", "modules/**/*", "test.setup.ts", "vitest.config.mts"],
+  "exclude": ["convex", "node_modules", "dist"]
 }

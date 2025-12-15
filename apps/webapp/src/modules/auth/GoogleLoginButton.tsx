@@ -1,17 +1,12 @@
 'use client';
 
-import { api } from '@workspace/backend/convex/_generated/api';
-import { useAction } from 'convex/react';
 import { ChevronRight } from 'lucide-react';
-import { useCallback, useState } from 'react';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { useGoogleAuthAvailable } from '@/modules/app/useAppInfo';
+import { useGoogleLoginFlow } from './useGoogleLoginFlow';
 
 export interface GoogleLoginButtonProps {
   className?: string;
   variant?: 'default' | 'outline' | 'secondary' | 'ghost' | 'link' | 'destructive';
-  redirectUri?: string;
   showChevron?: boolean;
 }
 
@@ -21,48 +16,14 @@ interface _GoogleIconProps {
 
 /**
  * Google login button component with OAuth integration.
- * Handles Google authentication flow and redirects to callback URL.
+ * Uses the new backend-driven OAuth flow with popup windows.
  */
 export const GoogleLoginButton = ({
   className = 'w-full',
   variant = 'outline',
-  redirectUri = `${window.location.origin}/login/google/callback`,
   showChevron = false,
 }: GoogleLoginButtonProps) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const googleAuthAvailable = useGoogleAuthAvailable();
-  const generateGoogleAuthUrl = useAction(api.googleAuth.generateGoogleAuthUrl);
-
-  /**
-   * Handles Google login button click and initiates OAuth flow.
-   */
-  const handleGoogleLogin = useCallback(async () => {
-    // Check if Google auth is enabled
-    if (!googleAuthAvailable) {
-      toast.error('Google authentication is currently disabled or not configured');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      // Generate CSRF state and store it
-      const state = _generateState();
-      sessionStorage.setItem('google_oauth_state', state);
-
-      // Generate Google auth URL
-      const result = await generateGoogleAuthUrl({
-        redirectUri,
-        state,
-      });
-
-      // Redirect to Google
-      window.location.href = result.authUrl;
-    } catch (error) {
-      console.error('Failed to initiate Google login:', error);
-      toast.error('Failed to start Google login. Please try again.');
-      setIsLoading(false);
-    }
-  }, [googleAuthAvailable, generateGoogleAuthUrl, redirectUri]);
+  const { startGoogleLogin, isLoading, isAvailable } = useGoogleLoginFlow();
 
   // List-style layout
   if (variant === 'ghost' && showChevron) {
@@ -70,8 +31,8 @@ export const GoogleLoginButton = ({
       <button
         type="button"
         className="flex items-center justify-between w-full h-16 px-6 hover:bg-muted/50 transition-colors cursor-pointer group border-0 bg-transparent text-left disabled:cursor-not-allowed disabled:opacity-50"
-        onClick={handleGoogleLogin}
-        disabled={isLoading || !googleAuthAvailable}
+        onClick={startGoogleLogin}
+        disabled={isLoading || !isAvailable}
         aria-label="Sign in with Google"
       >
         <div className="flex items-center gap-4">
@@ -99,8 +60,8 @@ export const GoogleLoginButton = ({
   return (
     <Button
       variant={variant}
-      onClick={handleGoogleLogin}
-      disabled={isLoading || !googleAuthAvailable}
+      onClick={startGoogleLogin}
+      disabled={isLoading || !isAvailable}
       className={className}
     >
       {isLoading ? (
@@ -117,15 +78,6 @@ export const GoogleLoginButton = ({
     </Button>
   );
 };
-
-/**
- * Generates a secure random CSRF state parameter for OAuth flow.
- */
-function _generateState(): string {
-  const array = new Uint8Array(32);
-  crypto.getRandomValues(array);
-  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
-}
 
 /**
  * Renders the Google brand icon with proper colors and accessibility.

@@ -62,7 +62,30 @@ function getConvexUrl() {
 }
 
 /**
- * Create or update the webapp's .env.local file with the CONVEX_URL
+ * Generate a random port number in the development best practices range
+ * Range: 3000-9999 (avoiding system ports and staying within common dev range)
+ */
+function generateRandomPort() {
+  const MIN_PORT = 3000;
+  const MAX_PORT = 9999;
+  return Math.floor(Math.random() * (MAX_PORT - MIN_PORT + 1)) + MIN_PORT;
+}
+
+/**
+ * Update or add an environment variable in the env content
+ */
+function updateEnvVariable(envContent, key, value) {
+  const regex = new RegExp(`^${key}=.+$`, 'm');
+  if (regex.test(envContent)) {
+    return envContent.replace(regex, `${key}=${value}`);
+  }
+  // Add the variable (with newline if content doesn't end with one)
+  const separator = envContent && !envContent.endsWith('\n') ? '\n' : '';
+  return `${envContent}${separator}${key}=${value}\n`;
+}
+
+/**
+ * Create or update the webapp's .env.local file with the CONVEX_URL and PORT
  */
 function setupWebappEnv(convexUrl) {
   // Create the webapp directory if it doesn't exist
@@ -76,19 +99,18 @@ function setupWebappEnv(convexUrl) {
   // If the webapp .env.local already exists, read its content
   if (fs.existsSync(webappEnvPath)) {
     envContent = fs.readFileSync(webappEnvPath, 'utf8');
+  }
 
-    // Update or add the NEXT_PUBLIC_CONVEX_URL
-    if (envContent.includes('NEXT_PUBLIC_CONVEX_URL=')) {
-      envContent = envContent.replace(
-        /NEXT_PUBLIC_CONVEX_URL=.+/,
-        `NEXT_PUBLIC_CONVEX_URL=${convexUrl}`
-      );
-    } else {
-      envContent += `\nNEXT_PUBLIC_CONVEX_URL=${convexUrl}\n`;
-    }
+  // Update or add the NEXT_PUBLIC_CONVEX_URL
+  envContent = updateEnvVariable(envContent, 'NEXT_PUBLIC_CONVEX_URL', convexUrl);
+
+  // Generate and set a random port if PORT is not already set
+  if (!envContent.match(/^PORT=/m)) {
+    const randomPort = generateRandomPort();
+    envContent = updateEnvVariable(envContent, 'PORT', randomPort);
+    console.log(`🔧 Generated random port: ${randomPort}`);
   } else {
-    // Create a new .env.local file with just the CONVEX_URL
-    envContent = `NEXT_PUBLIC_CONVEX_URL=${convexUrl}\n`;
+    console.log('✅ PORT already configured in .env.local');
   }
 
   // Write the content to the webapp .env.local file

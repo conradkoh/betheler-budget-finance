@@ -114,8 +114,48 @@ export const setUserAccessLevelDefault = internalMutation({
 });
 
 /**
+ * Internal mutation to set all users with undefined accessLevel to 'user' in a single batch.
+ * Updates are executed in parallel for better performance.
+ * WARNING: This processes all users at once and may timeout for large user bases.
+ * For large datasets, use migrateUserAccessLevels (action) instead.
+ *
+ * @returns Object with count of users updated
+ */
+export const setAllUndefinedAccessLevelsToUser = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    // Fetch all users with undefined accessLevel
+    const allUsers = await ctx.db.query('users').collect();
+
+    // Filter users that need updating
+    const usersToUpdate = allUsers.filter((user) => user.accessLevel === undefined);
+
+    // Update all users in parallel
+    await Promise.all(
+      usersToUpdate.map((user) =>
+        ctx.db.patch(user._id, {
+          accessLevel: 'user',
+        })
+      )
+    );
+
+    console.log(
+      `Migration complete: Updated ${usersToUpdate.length} users to accessLevel: 'user' (out of ${allUsers.length} total users)`
+    );
+
+    return {
+      success: true,
+      updatedCount: usersToUpdate.length,
+      totalUsers: allUsers.length,
+    };
+  },
+});
+
+/**
  * Internal action to migrate all users to have explicit accessLevel values.
  * Sets undefined accessLevel fields to 'user' as the default.
+ * Processes users in batches to handle large datasets safely.
+ * Updates within each batch are executed in parallel for better performance.
  */
 export const migrateUserAccessLevels = internalAction({
   args: { cursor: v.optional(v.string()) }, // Convex cursor for pagination
@@ -130,19 +170,19 @@ export const migrateUserAccessLevels = internalAction({
       paginationOpts,
     });
 
-    let updatedCount = 0;
+    // Filter users that need updating
+    const usersToUpdate = results.page.filter((user) => user.accessLevel === undefined);
 
-    // Schedule mutations to update each user in the batch if needed
-    for (const user of results.page) {
-      if (user.accessLevel === undefined) {
-        await ctx.runMutation(internal.migration.setUserAccessLevelDefault, {
+    // Schedule mutations to update all users in the batch in parallel
+    await Promise.all(
+      usersToUpdate.map((user) =>
+        ctx.runMutation(internal.migration.setUserAccessLevelDefault, {
           userId: user._id,
-        });
-        updatedCount++;
-      }
-    }
+        })
+      )
+    );
 
-    console.log(`Processed batch: ${results.page.length} users, updated: ${updatedCount}`);
+    console.log(`Processed batch: ${results.page.length} users, updated: ${usersToUpdate.length}`);
 
     // If there are more users, schedule the next batch
     if (!results.isDone) {

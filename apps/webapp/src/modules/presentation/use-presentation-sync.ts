@@ -1,6 +1,6 @@
 import { api } from '@workspace/backend/convex/_generated/api';
 import { useSessionMutation, useSessionQuery } from 'convex-helpers/react/sessions';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -41,12 +41,8 @@ export function usePresentationSync({
   // Track previous presentation state to detect changes
   const prevPresentationActiveRef = useRef<boolean | null>(null);
 
-  // Convert UI slide (1-based) to API slide (0-based)
-  const _apiSlide = currentSlide - 1;
-
   // Get URL parameters to check sync status
   const searchParams = useSearchParams();
-  const router = useRouter();
   const slideParam = searchParams.get('slide');
 
   // Always enable sync since presentationKey is mandatory
@@ -67,15 +63,15 @@ export function usePresentationSync({
     }
   }, [slideParam, totalSlides, currentSlide]);
 
-  // Update URL when slide changes (without triggering a full page reload)
-  const updateUrlWithSlide = useCallback(
-    (slideNumber: number) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set('slide', slideNumber.toString());
-      router.push(`?${params.toString()}`, { scroll: false });
-    },
-    [searchParams, router]
-  );
+  // Update URL when slide changes (using replaceState to avoid browser history entries)
+  const updateUrlWithSlide = useCallback((slideNumber: number) => {
+    if (typeof window === 'undefined') return;
+
+    const params = new URLSearchParams(window.location.search);
+    params.set('slide', slideNumber.toString());
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState({}, '', newUrl);
+  }, []);
 
   // Get current state from backend using session query
   const presentationState = useSessionQuery(

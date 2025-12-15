@@ -63,10 +63,6 @@ export function ShareButton({ year, month, className }: ShareButtonProps) {
     [sessionId, createShareLink, year, month]
   );
 
-  const _handleOpenModal = useCallback(() => {
-    setIsOpen(true);
-  }, []);
-
   const handleCloseModal = useCallback(() => {
     setIsOpen(false);
   }, []);

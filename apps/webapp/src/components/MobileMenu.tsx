@@ -7,7 +7,6 @@ import React, { useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { useAuthState } from '@/modules/auth/AuthProvider';
 
 interface NavigationItem {
   href: string;
@@ -25,7 +24,6 @@ interface MobileMenuProps {
 export function MobileMenu({ items, isAuthenticated, loginButton, userMenu }: MobileMenuProps) {
   const [open, setOpen] = React.useState(false);
   const pathname = usePathname();
-  const _authState = useAuthState();
 
   const handleLinkClick = useCallback(() => {
     setOpen(false);

@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nx run-many --target=dev --projects=@workspace/webapp,@workspace/backend --parallel",
+    "test": "nx run-many --target=test --projects=@workspace/webapp,@workspace/backend",
+    "test:watch": "nx run-many --target=test:watch --projects=@workspace/webapp,@workspace/backend",
+    "dev": "nx run @workspace/webapp:dev",
     "setup": "node scripts/setup.js",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
@@ -24,13 +25,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@biomejs/biome": "2.0.6",
-    "@nx/workspace": "^20.6.1",
+    "@biomejs/biome": "2.1.2",
+    "@nx/workspace": "22.1.2",
     "@types/node": "^20.17.24",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.0",
-    "nx": "^20.6.1",
-    "typescript": "^5.3.3"
+    "nx": "22.1.2",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "@radix-ui/react-tooltip": "^1.1.8",
@@ -41,9 +42,11 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "@biomejs/biome",
+      "bun",
       "esbuild",
       "nx",
-      "sharp"
+      "sharp",
+      "unrs-resolver"
     ],
     "overrides": {
       "@radix-ui/react-dismissable-layer": "1.1.10"

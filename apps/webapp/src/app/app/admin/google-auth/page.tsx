@@ -46,14 +46,17 @@ export default function GoogleAuthConfigPage() {
   const [showClientSecret, setShowClientSecret] = useState(false);
 
   // Convex queries and mutations
-  const configData = useSessionQuery(api.system.thirdPartyAuthConfig.getGoogleAuthConfig);
-  const updateConfig = useSessionMutation(api.system.thirdPartyAuthConfig.updateGoogleAuthConfig);
-  const toggleEnabled = useSessionMutation(api.system.thirdPartyAuthConfig.toggleGoogleAuthEnabled);
-  const testConfig = useSessionAction(api.system.thirdPartyAuthConfig.testGoogleAuthConfig);
-  const resetConfig = useSessionMutation(api.system.thirdPartyAuthConfig.resetGoogleAuthConfig);
+  const configData = useSessionQuery(api.system.auth.google.getConfig);
+  const updateConfig = useSessionMutation(api.system.auth.google.updateConfig);
+  const toggleEnabled = useSessionMutation(api.system.auth.google.toggleEnabled);
+  const testConfig = useSessionAction(api.system.auth.google.testConfig);
+  const resetConfig = useSessionMutation(api.system.auth.google.resetConfig);
 
-  // Computed values
-  const redirectUris = useMemo(() => _getRedirectUris(), []);
+  // Computed values - generate redirect URIs on frontend
+  const redirectUris = useMemo(() => {
+    if (typeof window === 'undefined') return [];
+    return [`${window.location.origin}/api/auth/google/callback`];
+  }, []);
   const isConfigLoading = configData === undefined;
   const isPageLoading = appInfoLoading || isConfigLoading;
   const isFullyConfigured = isConfigured && enabled;
@@ -597,35 +600,13 @@ export default function GoogleAuthConfigPage() {
 }
 
 /**
- * Generates redirect URIs based on current domain for OAuth configuration.
- */
-function _getRedirectUris(): string[] {
-  if (typeof window === 'undefined') return [];
-
-  const { protocol, host } = window.location;
-  const baseUrl = `${protocol}//${host}`;
-
-  return [
-    `${baseUrl}/login/google/callback`,
-    `${baseUrl}/app/profile/connect/google/callback`,
-    // Add localhost for development if not already localhost
-    ...(host.includes('localhost')
-      ? []
-      : [
-          'http://localhost:3000/login/google/callback',
-          'http://localhost:3000/app/profile/connect/google/callback',
-        ]),
-  ];
-}
-
-/**
  * Copies text to clipboard and shows success/error toast notification.
  */
 async function _copyToClipboard(text: string): Promise<void> {
   try {
     await navigator.clipboard.writeText(text);
     toast.success('Copied to clipboard!');
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to copy to clipboard:', error);
     toast.error('Failed to copy to clipboard');
   }
@@ -658,7 +639,9 @@ function _getClientIdValidationClass(clientId: string): string {
     return '';
   }
   const validation = _validateClientIdFormat(clientId);
-  return validation.isValid ? 'border-green-500' : 'border-amber-500';
+  return validation.isValid
+    ? 'border-green-500 dark:border-green-400'
+    : 'border-amber-500 dark:border-amber-400';
 }
 
 /**
@@ -758,7 +741,7 @@ async function _handleToggleEnabled(
     await toggleEnabled({ enabled: newEnabled });
     setEnabled(newEnabled);
     toast.success(`Google Auth ${newEnabled ? 'enabled' : 'disabled'} successfully`);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to toggle Google Auth:', error);
     toast.error('Failed to toggle Google Auth. Please try again.');
   }
@@ -831,8 +814,8 @@ async function _handleSave(params: _SaveConfigParams): Promise<void> {
 
     toast.success('Google Auth configuration saved successfully');
     setIsConfigured(true);
-  } catch (error) {
-    console.error('Failed to save configuration:', error);
+  } catch (error: unknown) {
+    console.error('Failed to save Google Auth configuration:', error);
     toast.error('Failed to save configuration. Please try again.');
   } finally {
     setIsFormLoading(false);
@@ -874,12 +857,9 @@ async function _handleTest(
       toast.success(`✅ Configuration is valid: ${result.message}`);
     } else {
       toast.error(`❌ Configuration failed: ${result.message}`);
-      if (result.details?.issues) {
-        console.log('Configuration issues:', result.details.issues);
-      }
     }
-  } catch (error) {
-    console.error('Failed to test configuration:', error);
+  } catch (error: unknown) {
+    console.error('Failed to test Google Auth configuration:', error);
     toast.error('Failed to test configuration. Please try again.');
   }
 }
@@ -910,8 +890,8 @@ async function _handleReset(
     setClientId('');
     setClientSecret('');
     setIsConfigured(false);
-  } catch (error) {
-    console.error('Failed to reset configuration:', error);
+  } catch (error: unknown) {
+    console.error('Failed to reset Google Auth configuration:', error);
     toast.error('Failed to reset configuration. Please try again.');
   }
 }

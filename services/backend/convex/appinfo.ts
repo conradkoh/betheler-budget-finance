@@ -1,17 +1,38 @@
 import { query } from './_generated/server';
 
+// Public interfaces and types
+export interface AppInfo {
+  version: string;
+  googleAuthAvailable: boolean;
+  googleAuthDetails: GoogleAuthDetails;
+}
+
+export interface GoogleAuthDetails {
+  isConfiguredInDatabase: boolean;
+  isEnabled: boolean;
+  hasClientId: boolean;
+  hasClientSecret: boolean;
+}
+
+// Internal types
+interface _GoogleAuthConfig {
+  clientId?: string;
+  clientSecret?: string;
+  enabled?: boolean;
+}
+
 /**
  * Gets application information including version and authentication configuration.
  * Provides frontend components with app metadata and Google Auth availability status.
  */
 export const get = query({
   args: {},
-  handler: async (ctx, _args) => {
+  handler: async (ctx, _args): Promise<AppInfo> => {
     const appInfo = await ctx.db.query('appInfo').first();
 
     // Get Google Auth configuration from database
     const googleAuthConfig = await ctx.db
-      .query('thirdPartyAuthConfig')
+      .query('auth_providerConfigs')
       .withIndex('by_type', (q) => q.eq('type', 'google'))
       .first();
 
@@ -26,12 +47,11 @@ export const get = query({
   },
 });
 
+// Internal helper functions
 /**
  * Computes Google Auth configuration details from database config.
  */
-function _computeGoogleAuthDetails(
-  googleAuthConfig: { clientId?: string; clientSecret?: string; enabled?: boolean } | null
-) {
+function _computeGoogleAuthDetails(googleAuthConfig: _GoogleAuthConfig | null): GoogleAuthDetails {
   const isConfiguredInDatabase = !!(googleAuthConfig?.clientId && googleAuthConfig?.clientSecret);
   const isEnabled = googleAuthConfig?.enabled || false;
 

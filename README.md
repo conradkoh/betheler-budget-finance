@@ -3,6 +3,7 @@
 This is a budgeting and financial management application for Bethel ER, built using NextJS and Convex, managed with NX for monorepo capabilities.
 
 ## Getting Started
+
 ### Pre-requisites
 
 - Node.js 22 or later
@@ -10,10 +11,12 @@ This is a budgeting and financial management application for Bethel ER, built us
 - Convex account - Register at https://www.convex.dev/
 
 ### Setup
+
 1. Run `pnpm install` to install the dependencies
 2. Run `pnpm run setup` to initialize the Convex backend and configure the webapp
 
    This script will:
+
    - Initialize the Convex backend using `npx convex dev --once`
    - Extract the CONVEX_URL from the backend's .env.local file
    - Create/update the webapp's .env.local file with the NEXT_PUBLIC_CONVEX_URL
@@ -21,7 +24,9 @@ This is a budgeting and financial management application for Bethel ER, built us
 3. Run `pnpm dev` in the root directory to start the NextJS application and Convex backend
 
 #### Manual Setup (Alternative)
+
 If you prefer to set up manually:
+
 1. Go to `services/backend` and run `npx convex dev --once` - this should prompt you to login to Convex and create a new project.
    Note: This will create a .env.local file with the CONVEX_URL environment variable.
 2. Create a `.env.local` file in the `apps/webapp` directory and add the following:
@@ -50,7 +55,6 @@ To enable Google OAuth authentication:
    - Login with your system admin account
    - Go to your username → "System Admin" → "Google Auth Config"
    - Follow the instructions to set up Google OAuth credentials
-   
 2. **Transfer admin role to Google account** (Recommended):
    - After Google Auth is configured, sign in with your Google account
    - In [Convex Dashboard](https://dashboard.convex.dev), go to Data > `users` table
@@ -77,6 +81,26 @@ This will start:
 - The webapp at http://localhost:3000
 - The Convex backend development server
 
+## Testing
+
+This project uses [Vitest](https://vitest.dev/) for testing across both frontend and backend.
+
+### Quick Start
+
+Run all tests:
+
+```bash
+pnpm test
+```
+
+Run tests in watch mode:
+
+```bash
+pnpm test:watch
+```
+
+For comprehensive testing guidelines, conventions, and examples, see the [Testing Guide](guides/testing/testing.md).
+
 ## NX Configuration
 
 This project uses NX to manage the monorepo and run tasks in parallel. The main configuration files are:
@@ -102,11 +126,13 @@ To add a new project to the monorepo:
 To deploy your Convex backend to production:
 
 1. Generate a deployment key from the Convex dashboard:
+
    - Go to your project in the [Convex dashboard](https://dashboard.convex.dev)
    - Navigate to Settings > URL & Deploy Key
    - Create a new deployment key
 
 2. Add the deployment key to GitHub Secrets:
+
    - Go to your GitHub repository
    - Navigate to Settings > Secrets and variables > Actions
    - Click "New repository secret"
@@ -122,18 +148,20 @@ This setup allows for secure automated deployments of your Convex functions and 
 To deploy your NextJS frontend to Vercel:
 
 1. Navigate to your Convex dashboard:
+
    - Go to [Convex dashboard](https://dashboard.convex.dev)
    - Navigate to Settings > URL & Deploy Key
    - Copy the Deployment URL
 
 2. Set up the Vercel deployment
+
    - Go to the Vercel dashboard
    - Navigate to Project Settings > Build and Deployment > Root Directory
-      - Set the Root Directory to `apps/webapp`
+     - Set the Root Directory to `apps/webapp`
    - Navigate to Project Settings > Environment Variables
-      - Add a new variable:
-      - Name: `NEXT_PUBLIC_CONVEX_URL`
-      - Value: Paste the Deployment URL you copied from Convex
+     - Add a new variable:
+     - Name: `NEXT_PUBLIC_CONVEX_URL`
+     - Value: Paste the Deployment URL you copied from Convex
 
 3. Deploy your NextJS application to Vercel as usual.
 

@@ -74,7 +74,7 @@ export function Navigation() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4 sm:px-6">
-        <div className="flex">
+        <div className="mr-6 flex">
           {/* Link to /app (dashboard) instead of home page */}
           <Link
             href={authStatus.isAuthenticated ? '/app' : '/'}
@@ -115,29 +115,4 @@ export function Navigation() {
       </div>
     </header>
   );
-}
-
-/**
- * Renders the appropriate authentication section based on user state.
- */
-function _renderAuthSection(isLoading: boolean, isAuthenticated: boolean) {
-  if (isLoading) {
-    return null;
-  }
-
-  if (isAuthenticated) {
-    return <UserMenu />;
-  }
-
-  if (!featureFlags.disableLogin) {
-    return (
-      <Link href="/login">
-        <Button size="sm" variant="outline">
-          Login
-        </Button>
-      </Link>
-    );
-  }
-
-  return null;
 }

@@ -33,18 +33,6 @@ export interface AttendanceModuleProps {
 }
 
 /**
- * Internal component state interface for managing local UI state.
- */
-interface _AttendanceContentState {
-  expanded: string | null;
-  dialogOpen: boolean;
-  selectedPerson: string;
-  showFullListModal: boolean;
-  isManualJoin: boolean;
-  showCopyDialog: boolean;
-}
-
-/**
  * Main attendance content component that handles attendance list display and interactions.
  * Uses useSearchParams internally so it's wrapped in Suspense by the parent component.
  */
@@ -147,10 +135,10 @@ const _AttendanceContent = ({
               <Skeleton className="h-6 w-20" />
             ) : (
               <>
-                <Badge variant="outline" className="bg-green-50">
+                <Badge variant="outline" className="bg-green-50 dark:bg-green-950/20">
                   <CheckCircle2 className="h-3 w-3 mr-1" /> {attendingCount}
                 </Badge>
-                <Badge variant="outline" className="bg-red-50">
+                <Badge variant="outline" className="bg-red-50 dark:bg-red-950/20">
                   <XCircle className="h-3 w-3 mr-1" /> {notAttendingCount}
                 </Badge>
                 {pendingCount > 0 && <Badge variant="outline">{pendingCount} pending</Badge>}
@@ -271,7 +259,10 @@ const _AttendanceContent = ({
                       );
 
                       return (
-                        <div key={name} className="p-2 border rounded-md relative hover:bg-gray-50">
+                        <div
+                          key={name}
+                          className="p-2 border rounded-md relative hover:bg-accent/50"
+                        >
                           <button
                             className="cursor-pointer w-full text-left p-0 inline-block"
                             type="button"
@@ -341,7 +332,10 @@ const _AttendanceContent = ({
                         currentUser
                       );
                       return (
-                        <div key={name} className="p-2 border rounded-md relative hover:bg-gray-50">
+                        <div
+                          key={name}
+                          className="p-2 border rounded-md relative hover:bg-accent/50"
+                        >
                           <button
                             className="cursor-pointer w-full text-left p-0 inline-block"
                             type="button"
@@ -434,7 +428,7 @@ const _AttendanceContent = ({
                     const isYou = isCurrentUser(name, attendanceMap, isAuthenticated, currentUser);
 
                     return (
-                      <div key={name} className="p-2 border rounded-md relative hover:bg-gray-50">
+                      <div key={name} className="p-2 border rounded-md relative hover:bg-accent/50">
                         <button
                           className="cursor-pointer w-full text-left p-0 inline-block"
                           type="button"

@@ -54,7 +54,7 @@ interface SpendingBreakdownChartProps {
 
 export function SpendingBreakdownChart({
   data,
-  totalSpent,
+  totalSpent: _totalSpent,
   year,
   month,
   showBudgetComparison = false,

@@ -1,2 +1,6 @@
 #!/usr/bin/env sh
+# Run tests before pushing
+pnpm run test
+
+# Run typecheck before pushing
 pnpm run typecheck

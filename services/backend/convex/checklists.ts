@@ -169,7 +169,7 @@ export const toggleChecklistItem = mutation({
     }
 
     // Check if the checklist is still active
-    const _checklist = await _getActiveChecklist(ctx, item.checklistKey);
+    await _getActiveChecklist(ctx, item.checklistKey);
 
     // Toggle the completion status
     const updateData = _buildToggleUpdateData(!item.isCompleted, args.sessionId);

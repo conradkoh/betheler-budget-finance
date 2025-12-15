@@ -188,7 +188,7 @@ function _renderLoginOptions(googleAuthAvailable: boolean | null, sessionId: str
  */
 function _renderCodeLoginOption() {
   return (
-    <Link href="/login/code" className="block">
+    <Link href="/login/code" className="block no-underline">
       <div className="flex items-center justify-between h-16 px-6 hover:bg-muted/50 transition-colors cursor-pointer group">
         <div className="flex items-center gap-4">
           <div className="flex items-center justify-center w-8 h-8">

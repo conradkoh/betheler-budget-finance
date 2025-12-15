@@ -224,10 +224,10 @@ export default defineSchema({
   }).index('by_code', ['code']),
 
   /**
-   * Third-party authentication configuration for dynamic auth provider setup.
+   * Authentication provider configuration for dynamic auth provider setup.
    * Supports multiple auth providers (Google, GitHub, etc.) with unified structure.
    */
-  thirdPartyAuthConfig: defineTable({
+  auth_providerConfigs: defineTable({
     type: v.union(v.literal('google')), // Auth provider type (extensible for future providers)
     enabled: v.boolean(), // Whether this auth provider is enabled
     projectId: v.optional(v.string()), // Google Cloud Project ID (optional, for convenience links)
@@ -237,4 +237,35 @@ export default defineSchema({
     configuredBy: v.id('users'), // User who configured this (must be system_admin)
     configuredAt: v.number(), // When this configuration was created/updated
   }).index('by_type', ['type']),
+
+  /**
+   * Login requests for authentication provider flows (e.g., Google OAuth).
+   * Tracks the state of a login attempt and links to sessions and users.
+   */
+  auth_loginRequests: defineTable({
+    sessionId: v.string(), // Session initiating the login
+    status: v.union(v.literal('pending'), v.literal('completed'), v.literal('failed')), // Status of the login request
+    error: v.optional(v.string()), // Error message if failed
+    createdAt: v.number(), // Timestamp of creation
+    completedAt: v.optional(v.number()), // Timestamp of completion
+    provider: v.union(v.literal('google')), // e.g., 'google'
+    expiresAt: v.number(), // When this login request expires (15 minutes from creation)
+    redirectUri: v.string(), // The OAuth redirect URI used for this login request
+  }),
+
+  /**
+   * Connect requests for authentication provider account linking flows (e.g., Google OAuth).
+   * Tracks the state of a connect attempt and links to sessions and users.
+   * Separate from login requests to make flow types explicit and ensure proper validation.
+   */
+  auth_connectRequests: defineTable({
+    sessionId: v.string(), // Session initiating the connect
+    status: v.union(v.literal('pending'), v.literal('completed'), v.literal('failed')), // Status of the connect request
+    error: v.optional(v.string()), // Error message if failed
+    createdAt: v.number(), // Timestamp of creation
+    completedAt: v.optional(v.number()), // Timestamp of completion
+    provider: v.union(v.literal('google')), // e.g., 'google'
+    expiresAt: v.number(), // When this connect request expires (15 minutes from creation)
+    redirectUri: v.string(), // The OAuth redirect URI used for this connect request
+  }),
 });

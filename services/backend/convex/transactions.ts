@@ -1,7 +1,6 @@
 import { v } from 'convex/values';
 import { SessionIdArg } from 'convex-helpers/server/sessions';
 import { getAuthUser } from '../modules/auth/getAuthUser';
-import { api } from './_generated/api';
 import { mutation, query } from './_generated/server';
 import { getDateRange, getMonthDateRange } from './utils';
 
@@ -335,21 +334,6 @@ export const getMonthlyFinancialSummary = query({
         q.eq('userId', user._id).gte('datetime', startDateISO).lte('datetime', endDateISO)
       )
       .collect();
-
-    // Get budget data from budget service
-    const _budgetData: {
-      totalBudget: number;
-      totalSpent: number;
-      totalRemaining: number;
-      percentSpent: number;
-      budgetCount: number;
-      status: string;
-    } = await ctx.runQuery(api.budgets.getTotalBudgetSummary, {
-      sessionId: args.sessionId,
-      year: args.year,
-      month: args.month,
-      timezoneOffsetMinutes: args.timezoneOffsetMinutes,
-    });
 
     // Calculate totals by transaction type
     let totalIncome = 0;

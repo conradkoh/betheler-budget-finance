@@ -63,14 +63,14 @@ export default function AdminDashboard() {
     if (isLoading) return { text: 'Loading...', className: 'text-muted-foreground' };
 
     if (appInfo?.googleAuthAvailable) {
-      return { text: 'Active', className: 'text-green-600' };
+      return { text: 'Active', className: 'text-green-600 dark:text-green-400' };
     }
 
     if (appInfo?.googleAuthDetails.isConfiguredInDatabase) {
-      return { text: 'Disabled', className: 'text-yellow-600' };
+      return { text: 'Disabled', className: 'text-yellow-600 dark:text-yellow-400' };
     }
 
-    return { text: 'Unconfigured', className: 'text-red-600' };
+    return { text: 'Unconfigured', className: 'text-red-600 dark:text-red-400' };
   }, [appInfo, isLoading]);
 
   return (

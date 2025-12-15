@@ -46,7 +46,7 @@ interface SharedFinancialOverviewProps {
 export function SharedFinancialOverview({
   shareId,
   selectedDate,
-  onDateChange,
+  onDateChange: _onDateChange,
   className,
 }: SharedFinancialOverviewProps) {
   // Tab state

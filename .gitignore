@@ -1,2 +1,18 @@
 node_modules
 .nx
+.DS_Store
+dist/
+*.tsbuildinfo
+
+# Nx Cloud
+.nx/cache
+
+# Next.js
+.next/
+out/
+
+# Testing
+coverage/
+
+# Misc
+.env*.local

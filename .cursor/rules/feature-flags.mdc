@@ -1,8 +1,0 @@
----
-description: 
-globs: 
-alwaysApply: true
----
-# Feature Flags
-## Frontend
-The [featureFlags.ts](mdc:apps/webapp/src/lib/featureFlags.ts) file contains the feature flags for the app.

@@ -4,6 +4,7 @@ import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
 import type * as React from 'react';
 
 import { buttonVariants } from '@/components/ui/button';
+import { useAllowTouchSelection } from '@/hooks/useAllowTouchSelection';
 import { cn } from '@/lib/utils';
 
 function AlertDialog({ ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Root>) {
@@ -40,6 +41,11 @@ function AlertDialogContent({
   className,
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Content>) {
+  // Fix iOS text selection handles not being draggable
+  // Must be called before react-remove-scroll attaches its listeners
+  // https://github.com/theKashey/react-remove-scroll/pull/144
+  useAllowTouchSelection();
+
   return (
     <AlertDialogPortal>
       <AlertDialogOverlay />

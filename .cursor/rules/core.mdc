@@ -1,0 +1,68 @@
+---
+description: Core coding rules and principles for all development work
+globs: "**"
+alwaysApply: true
+---
+
+<urgent-rules>
+1. Do not run `npm run dev`
+2. Prefer to use semantic search or a precise search tool over executing the sed or grep command when searching in the code base
+</urgent-rules>
+
+<coding-rules>
+Follow these rules for code generations.
+
+## Considerations
+
+### Size of edits
+
+When tackling complex changes prefer incremental changes, or creating completely new code and migrating over, to simplify the test.
+For large complex migrations, make sure you use create a plan, and verify your changes against that plan as you proceed cautiously.
+
+### Performance and Costs
+
+When querying a database, always consider the performance of the query. Use an index when looking up on columns that have large volumes of data, or on well ordered columns.
+
+If you are using a Convex backend, remember that the computations run in the database itself, making it feasible to do large numbers of DB calls and doing n+1 queries efficiently.
+
+### Code Quality and Maintainability
+
+Consider the SOLID principles and the DAFT coding principles, applying the right amount of abstraction when writing code.
+
+### Naming & Semantics
+
+Ensure that function names match their actions, especially functions that mutate data. For example, functions that mutate state should clearly indicate in the name something like "create" or "write" or "update". Methods names with "get" should also not perform mutations.
+</coding-rules>
+
+<reference-material>
+
+# DAFT Coding Principles
+
+The DAFT coding principles are a set of principles that are used to guide the construction of effective abstractions in software development.
+
+## D is for Dimensionality
+
+When creating an abstraction, it is important to determine the dimensionality of the problem we are abstracting over.
+Examples:
+
+- High dimensionality - the UI layer in HTML (e.g. div), due to the number of possible parameters used as an input
+- Low dimensionality - a math utility function that computes the fibonacci sequence
+
+If the problem is inherently high dimensionality, then an abstraction will not solve the problem.
+
+## A is for Atomicity
+
+When creating an abstraction, the abstraction should be atomic. This means the abstraction should not be responsible for too many things at once. This is congruent to the single responsibility principle.
+
+## F is for Friction
+
+When creating an abstraction, consider the amount of friction they introduce. For example
+
+- A UI component with 50 mandatory props (High friction)
+- A UI component with good defaults and 1-2 optional props to pass in (Low friction)
+
+## T is for Testing
+
+When creating an abstraction, it is important to consider whether the abstraction is testable. Often simple functions are more testable than complex classes.
+
+</reference-material>

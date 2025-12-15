@@ -52,11 +52,6 @@ export function SharedTransactionView({ shareId }: SharedTransactionViewProps) {
     });
   }, [sharedTransactions]);
 
-  const _total = useMemo(() => {
-    if (!sharedTransactions || sharedTransactions === null) return 0;
-    return sharedTransactions.transactions.reduce((sum, tx) => sum + tx.amount, 0);
-  }, [sharedTransactions]);
-
   // Add calculations for specific transaction types
   const totalByType = useMemo(() => {
     if (!sharedTransactions || sharedTransactions === null)

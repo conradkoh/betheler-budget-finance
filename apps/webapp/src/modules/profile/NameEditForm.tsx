@@ -2,6 +2,7 @@
 
 import { ChevronDownIcon } from '@radix-ui/react-icons';
 import { api } from '@workspace/backend/convex/_generated/api';
+import type { Id } from '@workspace/backend/convex/_generated/dataModel';
 import { useQuery } from 'convex/react';
 import { useSessionMutation } from 'convex-helpers/react/sessions';
 import { X } from 'lucide-react';
@@ -27,20 +28,21 @@ import {
 import { useAuthState, useCurrentUser } from '@/modules/auth/AuthProvider';
 import { ConnectButton, GoogleIcon } from '@/modules/auth/ConnectButton';
 
+// Helper function to create OAuth state for connect flow
+function createConnectOAuthState(connectRequestId: string): string {
+  const state = {
+    flowType: 'connect' as const,
+    requestId: connectRequestId,
+    version: 'v1' as const,
+  };
+  return encodeURIComponent(JSON.stringify(state));
+}
+
 interface _DisconnectDialogState {
   isOpen: boolean;
   providerId: string;
   providerName: string;
   isDisconnecting: boolean;
-}
-
-/**
- * Generates a cryptographically secure random state for CSRF protection.
- */
-function _generateState(): string {
-  const array = new Uint8Array(32);
-  crypto.getRandomValues(array);
-  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
 /**
@@ -64,6 +66,7 @@ export function NameEditForm() {
 
   // State for Google connection
   const [isConnectingGoogle, setIsConnectingGoogle] = useState(false);
+  const [connectLoginRequestId, setConnectLoginRequestId] = useState<string | null>(null);
 
   // State for disconnect confirmation dialog
   const [disconnectDialog, setDisconnectDialog] = useState<_DisconnectDialogState>({
@@ -75,7 +78,31 @@ export function NameEditForm() {
 
   // Convex mutations
   const updateUserName = useSessionMutation(api.auth.updateUserName);
-  const disconnectGoogle = useSessionMutation(api.googleAuth.disconnectGoogle);
+  const disconnectGoogle = useSessionMutation(api.auth.google.disconnectGoogle);
+  const createConnectRequest = useSessionMutation(api.auth.google.createConnectRequest);
+
+  // Query to poll connect request status for connect flow
+  const connectRequest = useQuery(
+    api.auth.google.getConnectRequest,
+    connectLoginRequestId
+      ? { connectRequestId: connectLoginRequestId as Id<'auth_connectRequests'> }
+      : 'skip'
+  );
+
+  // Effect to handle connect request status changes
+  useEffect(() => {
+    if (!connectRequest || !isConnectingGoogle) return;
+
+    if (connectRequest.status === 'completed') {
+      toast.success('Google account connected successfully!');
+      setIsConnectingGoogle(false);
+      setConnectLoginRequestId(null);
+    } else if (connectRequest.status === 'failed') {
+      toast.error(connectRequest.error || 'Failed to connect Google account');
+      setIsConnectingGoogle(false);
+      setConnectLoginRequestId(null);
+    }
+  }, [connectRequest, isConnectingGoogle]);
 
   // Initialize name when user data is available
   useEffect(() => {
@@ -106,8 +133,7 @@ export function NameEditForm() {
         await updateUserName({ newName: name.trim() });
         setIsEditing(false);
         toast.success('Name updated successfully');
-      } catch (error) {
-        console.error('Failed to update name:', error);
+      } catch (_error) {
         setError('Failed to update name. Please try again.');
       } finally {
         setIsLoading(false);
@@ -132,27 +158,72 @@ export function NameEditForm() {
   const handleGoogleConnect = useCallback(async () => {
     setIsConnectingGoogle(true);
     try {
-      const state = _generateState();
-      sessionStorage.setItem('google_oauth_connect_state', state);
+      // Generate redirect URI from current window location
+      if (typeof window === 'undefined') {
+        throw new Error('Window is not available');
+      }
 
-      const redirectUri = `${window.location.origin}/app/profile/connect/google/callback`;
+      const redirectUri = `${window.location.origin}/api/auth/google/callback`;
+
+      // Create a connect request in the backend for connect flow
+      const result = await createConnectRequest({ redirectUri });
+
+      // Set the connect request ID for polling
+      setConnectLoginRequestId(result.connectId);
+
+      // Generate the Google OAuth URL using the structured state parameter
+      const state = createConnectOAuthState(result.connectId);
       const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${new URLSearchParams({
         client_id: googleAuthAvailable?.clientId || '',
         redirect_uri: redirectUri,
         response_type: 'code',
         scope: 'openid email profile',
-        state,
+        state: state,
         access_type: 'offline',
         prompt: 'consent',
       })}`;
 
-      window.location.href = authUrl;
-    } catch (error) {
-      console.error('Failed to initiate Google connection:', error);
+      // Open popup window instead of redirecting current page
+      const popup = window.open(
+        authUrl,
+        'google-oauth-connect',
+        'width=500,height=600,scrollbars=yes,resizable=yes,status=yes,location=yes,toolbar=no,menubar=no'
+      );
+
+      if (!popup) {
+        toast.error('Failed to open popup. Please enable popups and try again.');
+        setIsConnectingGoogle(false);
+        setConnectLoginRequestId(null);
+        return;
+      }
+
+      // Poll for popup closure
+      const pollInterval = setInterval(() => {
+        if (popup.closed) {
+          clearInterval(pollInterval);
+          // Don't reset connecting state here - let the login request status handle it
+        }
+      }, 1000);
+
+      // Cleanup on timeout
+      setTimeout(
+        () => {
+          clearInterval(pollInterval);
+          if (!popup.closed) {
+            popup.close();
+          }
+          toast.error('Connection timeout. Please try again.');
+          setIsConnectingGoogle(false);
+          setConnectLoginRequestId(null);
+        },
+        15 * 60 * 1000
+      ); // 15 minutes timeout
+    } catch (_error) {
       toast.error('Failed to connect Google account');
       setIsConnectingGoogle(false);
+      setConnectLoginRequestId(null);
     }
-  }, [googleAuthAvailable?.clientId]);
+  }, [googleAuthAvailable?.clientId, createConnectRequest]);
 
   // Handle disconnect confirmation
   const showDisconnectConfirmation = useCallback((providerId: string, providerName: string) => {
@@ -177,8 +248,7 @@ export function NameEditForm() {
           providerName: '',
           isDisconnecting: false,
         });
-      } catch (error) {
-        console.error('Failed to disconnect Google:', error);
+      } catch (_error) {
         toast.error('Failed to disconnect Google account');
         setDisconnectDialog((prev) => ({ ...prev, isDisconnecting: false }));
       }
@@ -415,7 +485,7 @@ function _renderSessionInfo(authMethod: string | undefined) {
 }
 
 /**
- * Renders third-party authentication accounts section.
+ * Renders authentication provider accounts section.
  */
 function _renderThirdPartyAccounts(
   _user: { google?: { email?: string } },

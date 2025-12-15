@@ -11,7 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useCurrentUser } from '@/modules/auth/AuthProvider';
 
 /**
  * Configuration options for copying attendance data.
@@ -47,7 +46,6 @@ export const AttendanceCopyDialog = ({
   allNames,
   attendanceMap,
 }: AttendanceCopyDialogProps) => {
-  const _currentUser = useCurrentUser();
   const [copySuccess, setCopySuccess] = useState(false);
   const [copyOptions, setCopyOptions] = useState<CopyOptions>({
     includeRemarks: false,
@@ -175,7 +173,7 @@ export const AttendanceCopyDialog = ({
           {/* Preview */}
           <div className="space-y-2">
             <h4 className="text-sm font-medium">Preview</h4>
-            <div className="border rounded-md p-3 bg-gray-50 text-sm font-mono whitespace-pre-wrap h-60 overflow-y-auto">
+            <div className="border rounded-md p-3 bg-muted text-sm font-mono whitespace-pre-wrap h-60 overflow-y-auto">
               {generateCopyText()}
             </div>
           </div>
