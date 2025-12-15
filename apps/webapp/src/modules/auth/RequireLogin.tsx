@@ -2,6 +2,7 @@
 
 import { Loader2 } from 'lucide-react';
 import { useMemo } from 'react';
+
 import { UnauthorizedPage } from '@/components/UnauthorizedPage';
 import { useAuthState } from '@/modules/auth/AuthProvider';
 

@@ -2,6 +2,7 @@
 import { api } from '@workspace/backend/convex/_generated/api';
 import { fetchAction } from 'convex/nextjs';
 import { Suspense } from 'react';
+
 import { CallbackErrorCard } from '@/components/CallbackErrorCard';
 import { CallbackSuccessCard } from '@/components/CallbackSuccessCard';
 
@@ -103,7 +104,7 @@ export default async function GoogleOAuthCallbackPage({
   // Return appropriate UI based on result
   if (callbackResult.success) {
     return (
-      <Suspense fallback={<_LoadingState />}>
+      <Suspense fallback={<LoadingState />}>
         <CallbackSuccessCard
           flowType={callbackResult.flowType}
           userName={callbackResult.userName}
@@ -168,7 +169,7 @@ function _getUserFriendlyError(errorCode: string, errorDescription?: string): st
 /**
  * Displays a loading state while processing the OAuth callback.
  */
-function _LoadingState() {
+function LoadingState() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6 text-center">

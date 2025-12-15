@@ -1,5 +1,6 @@
 import { ConvexError, v } from 'convex/values';
 import { SessionIdArg } from 'convex-helpers/server/sessions';
+
 import { isSystemAdmin } from '../../../modules/auth/accessControl';
 import { getAuthUserOptional } from '../../../modules/auth/getAuthUser';
 import { api, internal } from '../../_generated/api';
@@ -159,7 +160,7 @@ export const updateConfig = mutation({
 
     if (existingConfig) {
       // Update existing configuration
-      await ctx.db.patch(existingConfig._id, configData);
+      await ctx.db.patch('auth_providerConfigs', existingConfig._id, configData);
     } else {
       // Create new configuration
       await ctx.db.insert('auth_providerConfigs', configData);
@@ -207,7 +208,7 @@ export const toggleEnabled = mutation({
 
     if (existingConfig) {
       // Update existing configuration
-      await ctx.db.patch(existingConfig._id, {
+      await ctx.db.patch('auth_providerConfigs', existingConfig._id, {
         enabled: args.enabled,
         configuredAt: now,
       });
@@ -450,7 +451,7 @@ export const resetConfig = mutation({
       .first();
 
     if (existingConfig) {
-      await ctx.db.delete(existingConfig._id);
+      await ctx.db.delete('auth_providerConfigs', existingConfig._id);
     }
 
     return {

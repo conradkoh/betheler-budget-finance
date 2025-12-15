@@ -3,6 +3,11 @@
 import type { Id } from '@workspace/backend/convex/_generated/dataModel';
 import { CheckCheck, GripVertical, Loader2, MoreVertical, RotateCcw, Trash2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { ChecklistInlineInput } from './checklist-inline-input';
+import type { ChecklistItemWithOptimistic, ChecklistProps } from './types';
+import { useChecklistSync } from './use-checklist-sync';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -14,14 +19,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Progress } from '@/components/ui/progress';
-import { ChecklistInlineInput } from './checklist-inline-input';
-import type { ChecklistItemWithOptimistic, ChecklistProps } from './types';
-import { useChecklistSync } from './use-checklist-sync';
 
 /**
  * Internal props for the ChecklistItemComponent.
  */
-interface _ChecklistItemComponentProps {
+interface ChecklistItemComponentProps {
   item: ChecklistItemWithOptimistic;
   onToggle: (itemId: string | Id<'checklistItems'>) => void;
   onDelete: (itemId: string | Id<'checklistItems'>) => void;
@@ -290,7 +292,7 @@ export function Checklist({ title, checklistKey, description, className }: Check
           ) : (
             <ul className="space-y-2">
               {items.map((item, index) => (
-                <_ChecklistItemComponent
+                <ChecklistItemComponent
                   key={item._id}
                   item={item}
                   onToggle={handleToggleItem}
@@ -324,7 +326,7 @@ export function Checklist({ title, checklistKey, description, className }: Check
  * Handles both persisted and optimistic items with appropriate visual states.
  * Internal component for checklist item rendering.
  */
-function _ChecklistItemComponent({
+function ChecklistItemComponent({
   item,
   onToggle,
   onDelete,
@@ -334,7 +336,7 @@ function _ChecklistItemComponent({
   onDragStart,
   onDragOver,
   onDrop,
-}: _ChecklistItemComponentProps) {
+}: ChecklistItemComponentProps) {
   const isOptimistic = 'isOptimistic' in item && item.isOptimistic;
   const isPending = 'isPending' in item && item.isPending;
   const canDrag = isActive && !isOptimistic && !isPending;

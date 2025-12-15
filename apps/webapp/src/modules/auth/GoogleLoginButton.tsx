@@ -1,8 +1,10 @@
 'use client';
 
 import { ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+
 import { useGoogleLoginFlow } from './useGoogleLoginFlow';
+
+import { Button } from '@/components/ui/button';
 
 export interface GoogleLoginButtonProps {
   className?: string;
@@ -10,7 +12,7 @@ export interface GoogleLoginButtonProps {
   showChevron?: boolean;
 }
 
-interface _GoogleIconProps {
+interface GoogleIconProps {
   className?: string;
 }
 
@@ -37,7 +39,7 @@ export const GoogleLoginButton = ({
       >
         <div className="flex items-center gap-4">
           <div className="flex items-center justify-center w-8 h-8">
-            <_GoogleIcon className="h-5 w-5" />
+            <GoogleIcon className="h-5 w-5" />
           </div>
           <div className="flex flex-col">
             <span className="font-medium text-left">
@@ -71,7 +73,7 @@ export const GoogleLoginButton = ({
         </>
       ) : (
         <>
-          <_GoogleIcon className="mr-2 h-4 w-4" />
+          <GoogleIcon className="mr-2 h-4 w-4" />
           Continue with Google
         </>
       )}
@@ -82,7 +84,7 @@ export const GoogleLoginButton = ({
 /**
  * Renders the Google brand icon with proper colors and accessibility.
  */
-function _GoogleIcon({ className }: _GoogleIconProps) {
+function GoogleIcon({ className }: GoogleIconProps) {
   return (
     <svg
       className={className}

@@ -1,6 +1,7 @@
 'use client';
 
 import type React from 'react';
+
 import { usePasswordProtection } from './PasswordProtectContext';
 
 export interface PasswordProtectedConditionalRenderProps {

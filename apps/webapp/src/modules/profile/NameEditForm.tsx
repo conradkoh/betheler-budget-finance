@@ -8,6 +8,7 @@ import { useSessionMutation } from 'convex-helpers/react/sessions';
 import { X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -402,7 +403,6 @@ function _renderUserAvatar(user: { type: string; google?: { picture?: string }; 
 
   if (profilePicture) {
     return (
-      // biome-ignore lint/performance/noImgElement: this is an external image
       <img
         src={profilePicture}
         alt={`${user.name}'s profile`}

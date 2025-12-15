@@ -1,7 +1,8 @@
 import { v } from 'convex/values';
+
 import { featureFlags } from '../config/featureFlags';
-import { generateLoginCode } from '../modules/auth/codeUtils';
 import { internalMutation } from './_generated/server';
+import { generateLoginCode } from '../modules/auth/codeUtils';
 
 /**
  * Find users by exact name match and retrieve their session information
@@ -55,7 +56,7 @@ export const generateTempLoginCode = internalMutation({
     }
 
     // Verify the user exists
-    const user = await ctx.db.get(args.userId);
+    const user = await ctx.db.get('users', args.userId);
     if (!user) {
       throw new Error('User not found');
     }
@@ -68,7 +69,7 @@ export const generateTempLoginCode = internalMutation({
 
     // Delete any existing login codes for this user
     for (const code of existingLoginCodes) {
-      await ctx.db.delete(code._id);
+      await ctx.db.delete('loginCodes', code._id);
     }
 
     // Generate a new login code

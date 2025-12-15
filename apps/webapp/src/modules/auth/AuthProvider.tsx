@@ -4,6 +4,7 @@ import type { AuthState } from '@workspace/backend/modules/auth/types/AuthState'
 import { SessionProvider, type UseStorage, useSessionQuery } from 'convex-helpers/react/sessions';
 import type { SessionId } from 'convex-helpers/server/sessions';
 import { createContext, useContext, useEffect, useState } from 'react';
+
 import { generateUUID } from '@/lib/utils';
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
@@ -41,7 +42,7 @@ function _withSessionProvider(Component: React.ComponentType<{ children: React.R
     return (
       <SessionProvider
         storageKey="sessionId"
-        useStorage={_useLocalStorage}
+        useStorage={useLocalStorageSession}
         idGenerator={generateUUID}
       >
         <Component {...props} />
@@ -53,7 +54,7 @@ function _withSessionProvider(Component: React.ComponentType<{ children: React.R
 /**
  * Custom local storage hook for session management that handles client-side hydration.
  */
-const _useLocalStorage = (
+const useLocalStorageSession = (
   key: string,
   nextSessionId: SessionId | undefined
 ): ReturnType<UseStorage<SessionId | undefined>> => {

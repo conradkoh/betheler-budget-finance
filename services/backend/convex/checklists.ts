@@ -1,5 +1,6 @@
 import { v } from 'convex/values';
 import { SessionIdArg } from 'convex-helpers/server/sessions';
+
 import { type MutationCtx, mutation, type QueryCtx, query } from './_generated/server';
 
 /**
@@ -163,7 +164,7 @@ export const toggleChecklistItem = mutation({
   },
   handler: async (ctx, args) => {
     // Get the item
-    const item = await ctx.db.get(args.itemId);
+    const item = await ctx.db.get('checklistItems', args.itemId);
     if (!item) {
       throw new Error('Checklist item not found');
     }
@@ -174,7 +175,7 @@ export const toggleChecklistItem = mutation({
     // Toggle the completion status
     const updateData = _buildToggleUpdateData(!item.isCompleted, args.sessionId);
 
-    return await ctx.db.patch(args.itemId, updateData);
+    return await ctx.db.patch('checklistItems', args.itemId, updateData);
   },
 });
 
@@ -190,7 +191,7 @@ export const deleteChecklistItem = mutation({
   },
   handler: async (ctx, args) => {
     // Get the item
-    const item = await ctx.db.get(args.itemId);
+    const item = await ctx.db.get('checklistItems', args.itemId);
     if (!item) {
       throw new Error('Checklist item not found');
     }
@@ -199,7 +200,7 @@ export const deleteChecklistItem = mutation({
     await _getActiveChecklist(ctx, item.checklistKey);
 
     // Delete the item
-    await ctx.db.delete(args.itemId);
+    await ctx.db.delete('checklistItems', args.itemId);
     return { success: true };
   },
 });
@@ -220,7 +221,7 @@ export const concludeChecklist = mutation({
     const checklist = await _getChecklistByKey(ctx, args.checklistKey);
 
     // Mark the checklist as inactive
-    return await ctx.db.patch(checklist._id, {
+    return await ctx.db.patch('checklistState', checklist._id, {
       isActive: false,
       concludedAt: Date.now(),
       concludedBy: args.sessionId,
@@ -244,7 +245,7 @@ export const reopenChecklist = mutation({
     const checklist = await _getChecklistByKey(ctx, args.checklistKey);
 
     // Mark the checklist as active and clear conclusion data
-    return await ctx.db.patch(checklist._id, {
+    return await ctx.db.patch('checklistState', checklist._id, {
       isActive: true,
       concludedAt: undefined,
       concludedBy: undefined,
@@ -274,7 +275,7 @@ export const clearCompletedItems = mutation({
       .collect();
 
     // Delete all completed items
-    await Promise.all(completedItems.map((item) => ctx.db.delete(item._id)));
+    await Promise.all(completedItems.map((item) => ctx.db.delete('checklistItems', item._id)));
 
     return { deletedCount: completedItems.length };
   },
@@ -303,7 +304,9 @@ export const reorderChecklistItems = mutation({
 
     // Update the order for each item
     await Promise.all(
-      args.itemOrders.map(({ itemId, newOrder }) => ctx.db.patch(itemId, { order: newOrder }))
+      args.itemOrders.map(({ itemId, newOrder }) =>
+        ctx.db.patch('checklistItems', itemId, { order: newOrder })
+      )
     );
 
     return { success: true };
@@ -314,7 +317,7 @@ export const reorderChecklistItems = mutation({
  * Calculates the next order number for a new checklist item.
  * Internal helper function for item ordering.
  */
-function _calculateNextOrder(existingItems: Array<{ order: number }>): number {
+function _calculateNextOrder(existingItems: { order: number }[]): number {
   return existingItems.length > 0 ? Math.max(...existingItems.map((item) => item.order)) + 1 : 0;
 }
 

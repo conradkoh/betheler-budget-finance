@@ -1,4 +1,5 @@
 import { useContext } from 'react';
+
 import { AppInfoContext, type AppInfoContextValue } from './AppInfoProvider';
 
 /**

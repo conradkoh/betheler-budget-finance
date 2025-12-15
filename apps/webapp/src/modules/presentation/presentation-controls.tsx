@@ -3,11 +3,13 @@
 import { Info, LinkIcon, Maximize2, Minimize2, MonitorSmartphone, UserIcon } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+
+import { usePresentationContext } from './presentation-container';
+import { Button } from '../../components/ui/button';
+
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { Button } from '../../components/ui/button';
-import { usePresentationContext } from './presentation-container';
 
 // Custom hook for safe client-side feature detection
 const useClientSideFeatures = () => {

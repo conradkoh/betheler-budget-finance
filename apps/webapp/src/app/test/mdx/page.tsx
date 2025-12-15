@@ -1,7 +1,8 @@
 'use client';
 
-import MdxLayout from '@/components/MdxLayout';
 import SampleMDX from './sample.mdx';
+
+import MdxLayout from '@/components/MdxLayout';
 
 /**
  * Test page for demonstrating MDX functionality and rendering capabilities.

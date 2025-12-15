@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -89,7 +90,7 @@ function ProfilePageContent() {
 
         <ThemeSettings />
 
-        <_RecoveryCodeSection />
+        <RecoveryCodeSection />
       </div>
     </div>
   );
@@ -133,7 +134,7 @@ export default function ProfilePage() {
 /**
  * Displays recovery code management section for account backup and restoration.
  */
-function _RecoveryCodeSection() {
+function RecoveryCodeSection() {
   const getOrCreateCode = useAction(api.auth.getOrCreateRecoveryCode);
   const regenerateCode = useAction(api.auth.regenerateRecoveryCode);
   const [sessionId] = useSessionId();

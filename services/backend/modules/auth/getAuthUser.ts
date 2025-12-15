@@ -1,4 +1,5 @@
 import type { SessionId } from 'convex-helpers/server/sessions';
+
 import type { MutationCtx, QueryCtx } from '../../convex/_generated/server';
 
 export const getAuthUser = async (ctx: QueryCtx | MutationCtx, args: { sessionId: SessionId }) => {
@@ -10,7 +11,7 @@ export const getAuthUser = async (ctx: QueryCtx | MutationCtx, args: { sessionId
     throw new Error('Session not found');
   }
 
-  const user = await ctx.db.get(session.userId);
+  const user = await ctx.db.get('users', session.userId);
 
   if (!user) {
     throw new Error('User not found');

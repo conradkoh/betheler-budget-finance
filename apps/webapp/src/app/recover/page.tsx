@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
+
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -28,7 +29,7 @@ import { AuthProvider } from '@/modules/auth/AuthProvider';
 export default function RecoverAccountPage() {
   return (
     <AuthProvider>
-      <_RecoverAccountForm />
+      <RecoverAccountForm />
     </AuthProvider>
   );
 }
@@ -36,7 +37,7 @@ export default function RecoverAccountPage() {
 /**
  * Main recovery form component that handles recovery code verification and account restoration.
  */
-function _RecoverAccountForm() {
+function RecoverAccountForm() {
   const verifyCode = useAction(api.auth.verifyRecoveryCode);
   const [sessionId, refreshSessionId] = useSessionId();
   const [recoveryCode, setRecoveryCode] = useState('');

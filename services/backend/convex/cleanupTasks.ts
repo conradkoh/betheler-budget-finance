@@ -1,4 +1,5 @@
 import { cronJobs } from 'convex/server';
+
 import { internal } from './_generated/api';
 import { internalMutation } from './_generated/server';
 
@@ -45,14 +46,14 @@ export const cleanupExpiredLoginRequests = internalMutation({
     // Delete expired login requests
     let deletedLoginCount = 0;
     for (const request of expiredLoginRequests) {
-      await ctx.db.delete(request._id);
+      await ctx.db.delete('auth_loginRequests', request._id);
       deletedLoginCount++;
     }
 
     // Delete expired connect requests
     let deletedConnectCount = 0;
     for (const request of expiredConnectRequests) {
-      await ctx.db.delete(request._id);
+      await ctx.db.delete('auth_connectRequests', request._id);
       deletedConnectCount++;
     }
 
@@ -87,7 +88,7 @@ export const cleanupExpiredConnectRequests = internalMutation({
     // Delete expired connect requests
     let deletedCount = 0;
     for (const request of expiredConnectRequests) {
-      await ctx.db.delete(request._id);
+      await ctx.db.delete('auth_connectRequests', request._id);
       deletedCount++;
     }
 
@@ -116,7 +117,7 @@ export const cleanupExpiredLoginCodes = internalMutation({
     // Delete expired codes
     let deletedCount = 0;
     for (const code of expiredCodes) {
-      await ctx.db.delete(code._id);
+      await ctx.db.delete('loginCodes', code._id);
       deletedCount++;
     }
 

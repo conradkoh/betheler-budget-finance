@@ -4,6 +4,7 @@ import { useSessionQuery } from 'convex-helpers/react/sessions';
 import { useRouter, useSearchParams } from 'next/navigation';
 // External imports
 import { useCallback, useEffect, useMemo, useState } from 'react';
+
 // Internal imports
 import { useCurrentUser } from '@/modules/auth/AuthProvider';
 

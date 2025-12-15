@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
+
 import { GoogleCallback } from '../components/GoogleCallback';
 
 /**

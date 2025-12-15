@@ -10,7 +10,7 @@
 
 - `package.json` - [Description of root workspace configuration]
 - `[workspace-config]` - [e.g., pnpm-workspace.yaml, nx.json, etc.]
-- `[linting-config]` - [e.g., biome.json, eslint.config.js, etc.]
+- `[linting-config]` - [e.g., eslint.config.js, biome.json, etc.]
 - `[other-config-files]` - [Additional configuration files and their purposes]
 
 ### Root Scripts

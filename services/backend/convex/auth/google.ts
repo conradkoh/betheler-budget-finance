@@ -2,6 +2,7 @@ import { ConvexError, v } from 'convex/values';
 import type { SessionId } from 'convex-helpers/server/sessions';
 import { SessionIdArg } from 'convex-helpers/server/sessions';
 import { z } from 'zod';
+
 import { featureFlags } from '../../config/featureFlags';
 import { api } from '../_generated/api';
 import type { Doc, Id } from '../_generated/dataModel';
@@ -236,7 +237,7 @@ export const loginWithGoogle = mutation({
                 message: 'User exists with different authentication type',
               });
             }
-            await ctx.db.patch(existingUser._id, {
+            await ctx.db.patch('users', existingUser._id, {
               email: profile.email,
               google: profile,
             });
@@ -276,7 +277,7 @@ export const loginWithGoogle = mutation({
 
       if (existingSession) {
         // Update existing session to link to the Google user
-        await ctx.db.patch(existingSession._id, {
+        await ctx.db.patch('sessions', existingSession._id, {
           userId: userId,
           authMethod: 'google',
         });
@@ -352,7 +353,7 @@ export const connectGoogle = mutation({
       });
     }
 
-    const currentUser = await ctx.db.get(session.userId);
+    const currentUser = await ctx.db.get('users', session.userId);
 
     if (!currentUser) {
       throw new ConvexError({
@@ -367,7 +368,7 @@ export const connectGoogle = mutation({
       await _convertAnonymousToFullUser(ctx, currentUser, profile);
 
       // Update session auth method to Google
-      await ctx.db.patch(session._id, {
+      await ctx.db.patch('sessions', session._id, {
         authMethod: 'google',
       });
 
@@ -433,7 +434,7 @@ export const connectGoogle = mutation({
       }
 
       // Connect Google account to current user
-      await ctx.db.patch(currentUser._id, {
+      await ctx.db.patch('users', currentUser._id, {
         google: profile,
         // Update email if current user doesn't have one or if Google email is different
         email: currentUser.email || profile.email,
@@ -478,7 +479,7 @@ export const disconnectGoogle = mutation({
       });
     }
 
-    const user = await ctx.db.get(session.userId);
+    const user = await ctx.db.get('users', session.userId);
 
     if (!user) {
       throw new ConvexError({
@@ -510,14 +511,14 @@ export const disconnectGoogle = mutation({
     }
 
     // Remove Google data from user
-    await ctx.db.patch(user._id, {
+    await ctx.db.patch('users', user._id, {
       google: undefined,
     });
 
     // If the current session was authenticated via Google, we might want to
     // keep the session active but change the auth method to indicate it's no longer Google
     if (session.authMethod === 'google') {
-      await ctx.db.patch(session._id, {
+      await ctx.db.patch('sessions', session._id, {
         authMethod: undefined, // Or could be 'disconnected' or similar
       });
     }
@@ -597,7 +598,7 @@ export const completeLoginRequest = mutation({
   },
   handler: async (ctx, args) => {
     const completedAt = Date.now();
-    await ctx.db.patch(args.loginRequestId, {
+    await ctx.db.patch('auth_loginRequests', args.loginRequestId, {
       status: args.status,
       completedAt,
       error: args.error,
@@ -618,7 +619,7 @@ export const completeConnectRequest = mutation({
   },
   handler: async (ctx, args) => {
     const completedAt = Date.now();
-    await ctx.db.patch(args.connectRequestId, {
+    await ctx.db.patch('auth_connectRequests', args.connectRequestId, {
       status: args.status,
       completedAt,
       error: args.error,
@@ -635,7 +636,7 @@ export const getLoginRequest = query({
     loginRequestId: v.id('auth_loginRequests'),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.loginRequestId);
+    return await ctx.db.get('auth_loginRequests', args.loginRequestId);
   },
 });
 
@@ -647,7 +648,7 @@ export const getConnectRequest = query({
     connectRequestId: v.id('auth_connectRequests'),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.connectRequestId);
+    return await ctx.db.get('auth_connectRequests', args.connectRequestId);
   },
 });
 
@@ -1008,7 +1009,7 @@ async function _convertAnonymousToFullUser(
     const uniqueUsername = `${username}_${randomSuffix}`;
 
     // Convert anonymous user to full user
-    await ctx.db.patch(anonymousUser._id, {
+    await ctx.db.patch('users', anonymousUser._id, {
       type: 'full',
       username: uniqueUsername,
       email: googleProfile.email,
@@ -1019,7 +1020,7 @@ async function _convertAnonymousToFullUser(
     });
   } else {
     // Convert anonymous user to full user
-    await ctx.db.patch(anonymousUser._id, {
+    await ctx.db.patch('users', anonymousUser._id, {
       type: 'full',
       username: username,
       email: googleProfile.email,

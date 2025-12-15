@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
 const fs = require('node:fs');
-const path = require('node:path');
 const { promises: fsPromises } = require('node:fs');
-const sharp = require('sharp');
+const path = require('node:path');
+
 const pngToIco = require('png-to-ico');
+const sharp = require('sharp');
 
 /**
  * PWA Asset Generator

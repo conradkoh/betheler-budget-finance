@@ -6,6 +6,7 @@ import { useSessionMutation, useSessionQuery } from 'convex-helpers/react/sessio
 import { Check, Copy, Loader2, RefreshCw, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+
 import { Button } from '@/components/ui/button';
 import { useAuthState } from '@/modules/auth/AuthProvider';
 

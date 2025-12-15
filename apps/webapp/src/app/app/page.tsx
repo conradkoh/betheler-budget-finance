@@ -3,6 +3,7 @@
 import { LayoutGrid, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
+
 import { FinancialOverview } from '@/components/FinancialOverview';
 import { TransactionModal } from '@/components/TransactionModal';
 import { Button } from '@/components/ui/button';

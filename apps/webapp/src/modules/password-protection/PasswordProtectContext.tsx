@@ -2,6 +2,7 @@
 
 import type React from 'react';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+
 import { verifyPassword } from './password-utils';
 
 export interface PasswordProtectConfig {

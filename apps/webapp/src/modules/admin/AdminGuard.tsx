@@ -4,6 +4,7 @@ import { ArrowLeft, Loader2, ShieldX } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { type ReactNode, useCallback, useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useAuthState } from '@/modules/auth/AuthProvider';

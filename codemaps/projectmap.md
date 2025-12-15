@@ -11,7 +11,8 @@ A full-stack web application starter template built with Next.js and Convex, fea
 - `package.json` - Root workspace configuration with development scripts, dependencies, and workspace orchestration
 - `pnpm-workspace.yaml` - pnpm workspace configuration defining packages in `apps/*` and `services/*`
 - `nx.json` - NX monorepo configuration for task orchestration and caching
-- `biome.json` - Biome linting and formatting configuration with strict TypeScript rules
+- `eslint.config.mjs` - ESLint configuration for linting with strict TypeScript, React, and Convex rules
+- `biome.json` - Biome configuration for code formatting (linting disabled, ESLint handles that)
 - `.github/` - GitHub workflows, issue templates, and project automation
 
 ### Root Scripts
@@ -35,7 +36,7 @@ A full-stack web application starter template built with Next.js and Convex, fea
 #### Configuration Files
 
 - `package.json` - Frontend dependencies including Next.js 15.5.2, React 19, and UI libraries
-- `next.config.ts` - Next.js configuration with MDX support, typed routes, and Biome integration
+- `next.config.ts` - Next.js configuration with MDX support, typed routes
 - `tsconfig.json` - TypeScript configuration with path aliases and strict type checking
 - `postcss.config.mjs` - PostCSS configuration for TailwindCSS processing
 - `components.json` - Shadcn UI configuration with New York style and Lucide icons
@@ -175,9 +176,9 @@ A full-stack web application starter template built with Next.js and Convex, fea
 
 - `dev` - Parallel development server startup for both frontend and backend
 - `setup` - Automated project initialization and environment configuration
-- `lint` - Code quality checking across all workspace packages
+- `lint` / `lint:fix` - Code quality linting using ESLint across all workspace packages
+- `format` / `format:fix` - Code formatting using Biome across all packages
 - `typecheck` - TypeScript validation across frontend and backend
-- `format` - Code formatting using Biome across all packages
 
 ## Tech Stack
 
@@ -210,11 +211,31 @@ A full-stack web application starter template built with Next.js and Convex, fea
 - **Vite** (v6.3.5) - Build tool and development server for fast hot module replacement
 - **Vitest** (v3.1.3) - Testing framework with TypeScript support and Vite integration
 
-### Linting & Formatting
+### Code Quality Tools
 
-- **Biome** (v2.1.2) - Fast linter and formatter with TypeScript support and strict rules
-- **Husky** (v9.1.7) - Git hooks for pre-commit quality checks
-- **lint-staged** (v15.5.0) - Run linting and formatting on staged files only
+#### Linting
+
+- **ESLint** (v9.26.0) - Code quality and correctness linting
+  - TypeScript-specific rules via @typescript-eslint
+  - React and React Hooks rules
+  - Convex-specific rules via @convex-dev/eslint-plugin
+  - Import organization and validation
+  - Detects unused variables, type issues, and code smells
+
+#### Formatting
+
+- **Biome** (v2.1.2) - Fast, opinionated code formatter
+  - Handles code style (indentation, quotes, semicolons, line width)
+  - Organizes imports automatically
+  - Linting disabled (ESLint handles all linting)
+  - Formats TypeScript, JavaScript, JSON, and Markdown
+
+#### Quality Automation
+
+- **Husky** (v9.1.7) - Git hooks for pre-commit and pre-push quality checks
+- **lint-staged** (v15.5.0) - Runs linting and formatting on staged files only
+  - TypeScript/JavaScript: ESLint (lint) → Biome (format)
+  - JSON/Markdown: Biome (format only)
 
 ### Authentication & Security
 
@@ -254,7 +275,10 @@ A full-stack web application starter template built with Next.js and Convex, fea
 - **Backend Testing** - Convex function testing with convex-test utilities and mocking
 - **Integration Testing** - End-to-end testing strategies for authentication and real-time features
 - **Type Checking** - Compile-time validation with strict TypeScript configuration
-- **Quality Gates** - Pre-commit hooks with linting, formatting, and type checking
+- **Quality Gates** - Pre-commit hooks enforcing:
+  - Linting (ESLint) - Code quality and correctness
+  - Formatting (Biome) - Consistent code style
+  - Type checking (TypeScript) - Type safety validation
 
 ## Development Patterns
 
@@ -267,7 +291,8 @@ A full-stack web application starter template built with Next.js and Convex, fea
 ### Code Organization & Quality
 
 - **Feature Modules** - Domain-driven organization with modules for each major feature area
-- **Quality Maintenance** - Automated code quality routines with Biome linting and formatting
+- **Code Quality** - ESLint for linting (correctness, best practices, type safety)
+- **Code Formatting** - Biome for consistent code style (indentation, quotes, spacing)
 - **Configuration Management** - Feature flags system for runtime behavior control
 
 ### User Experience & Interface
