@@ -17,9 +17,35 @@ This is a budgeting and financial management application for Bethel ER, built us
 
    This script will:
 
+   - **Check and update branding** - Detects if you're using template branding and prompts you to customize:
+     - Application name and short name
+     - App description
+     - Landing page title
+     - Package name
    - Initialize the Convex backend using `npx convex dev --once`
    - Extract the CONVEX_URL from the backend's .env.local file
    - Create/update the webapp's .env.local file with the NEXT_PUBLIC_CONVEX_URL
+
+   The setup script is **idempotent** - you can run it multiple times safely. It will:
+   - Show ✅ CONFIGURED for branding that's already customized
+   - Show ⚠️ TEMPLATE for branding that still uses default values
+   - Only prompt for updates if template values are detected
+
+   **Non-Interactive Mode**: For CI/CD or automated setups:
+   ```bash
+   node scripts/setup.js --non-interactive \
+     --app-name "My App" \
+     --app-short-name "MyApp" \
+     --app-description "Description" \
+     --landing-page-title "Welcome" \
+     --package-name "my-app"
+   
+   # Or skip branding entirely
+   node scripts/setup.js --skip-branding
+   
+   # Show all options
+   node scripts/setup.js --help
+   ```
 
 3. Run `pnpm dev` in the root directory to start the NextJS application and Convex backend
 
