@@ -30,11 +30,13 @@
   "devDependencies": {
     "@biomejs/biome": "2.1.2",
     "@convex-dev/eslint-plugin": "^1.1.1",
+    "@eslint/eslintrc": "^3",
     "@nx/workspace": "22.1.2",
     "@types/node": "^20.17.24",
     "@typescript-eslint/eslint-plugin": "^8.49.0",
     "@typescript-eslint/parser": "^8.49.0",
     "eslint": "^9.26.0",
+    "eslint-config-next": "16.0.10",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsdoc": "^61.5.0",
     "eslint-plugin-react": "^7.37.5",
