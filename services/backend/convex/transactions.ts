@@ -1,8 +1,9 @@
 import { v } from 'convex/values';
 import { SessionIdArg } from 'convex-helpers/server/sessions';
-import { getAuthUser } from '../modules/auth/getAuthUser';
+
 import { mutation, query } from './_generated/server';
 import { getDateRange, getMonthDateRange } from './utils';
+import { getAuthUser } from '../modules/auth/getAuthUser';
 
 export const create = mutation({
   args: {
@@ -98,7 +99,7 @@ export const remove = mutation({
     }
 
     // Fetch the transaction to verify ownership
-    const transaction = await ctx.db.get(args.transactionId);
+    const transaction = await ctx.db.get('transactions', args.transactionId);
 
     // Verify the transaction exists and belongs to the user
     if (!transaction) {
@@ -110,7 +111,7 @@ export const remove = mutation({
     }
 
     // Delete the transaction
-    await ctx.db.delete(args.transactionId);
+    await ctx.db.delete('transactions', args.transactionId);
 
     return true;
   },
@@ -426,7 +427,7 @@ export const migrateTransactionTypes = mutation({
         }
 
         // Update the transaction
-        await ctx.db.patch(transaction._id, {
+        await ctx.db.patch('transactions', transaction._id, {
           transactionType,
         });
 

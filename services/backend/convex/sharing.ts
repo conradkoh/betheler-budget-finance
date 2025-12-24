@@ -1,9 +1,10 @@
 import { v } from 'convex/values';
 import { SessionIdArg } from 'convex-helpers/server/sessions';
-import { getAuthUser } from '../modules/auth/getAuthUser';
+
 import type { Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { getMonthDateRange } from './utils';
+import { getAuthUser } from '../modules/auth/getAuthUser';
 
 // Generate a random share ID
 function generateShareId(): string {
@@ -118,7 +119,7 @@ export const deleteShareLink = mutation({
     }
 
     // Get the share link
-    const shareLink = await ctx.db.get(args.shareLinkId);
+    const shareLink = await ctx.db.get('shareLinks', args.shareLinkId);
     if (!shareLink) {
       throw new Error('Share link not found');
     }
@@ -129,7 +130,7 @@ export const deleteShareLink = mutation({
     }
 
     // Delete the share link
-    await ctx.db.delete(args.shareLinkId);
+    await ctx.db.delete('shareLinks', args.shareLinkId);
 
     return { success: true };
   },
@@ -155,7 +156,7 @@ export const deleteAllShareLinks = mutation({
 
     // Delete each share link
     for (const shareLink of shareLinks) {
-      await ctx.db.delete(shareLink._id);
+      await ctx.db.delete('shareLinks', shareLink._id);
     }
 
     return {
@@ -215,7 +216,7 @@ export const getSharedTransactions = query({
     }
 
     // Get user information for displaying in the shared view
-    const user = await ctx.db.get(shareLink.userId as Id<'users'>);
+    const user = await ctx.db.get('users', shareLink.userId as Id<'users'>);
     if (!user) {
       return null;
     }

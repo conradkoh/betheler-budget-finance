@@ -1,9 +1,10 @@
 import { v } from 'convex/values';
 import { SessionIdArg } from 'convex-helpers/server/sessions';
-import { getAuthUser } from '../modules/auth/getAuthUser';
+
 import { api } from './_generated/api';
 import { mutation, query } from './_generated/server';
 import { getMonthDateRange } from './utils';
+import { getAuthUser } from '../modules/auth/getAuthUser';
 
 // Create a new budget for a category in a specific month
 export const create = mutation({
@@ -65,7 +66,7 @@ export const update = mutation({
     }
 
     // Fetch the budget
-    const budget = await ctx.db.get(args.budgetId);
+    const budget = await ctx.db.get('budgets', args.budgetId);
 
     // Check if the budget exists and belongs to the user
     if (!budget || budget.userId !== user._id) {
@@ -73,7 +74,7 @@ export const update = mutation({
     }
 
     // Update the budget
-    await ctx.db.patch(args.budgetId, {
+    await ctx.db.patch('budgets', args.budgetId, {
       amount: args.amount,
       updatedAt: Date.now(),
     });
@@ -96,7 +97,7 @@ export const remove = mutation({
     }
 
     // Fetch the budget
-    const budget = await ctx.db.get(args.budgetId);
+    const budget = await ctx.db.get('budgets', args.budgetId);
 
     // Check if the budget exists and belongs to the user
     if (!budget || budget.userId !== user._id) {
@@ -104,7 +105,7 @@ export const remove = mutation({
     }
 
     // Delete the budget
-    await ctx.db.delete(args.budgetId);
+    await ctx.db.delete('budgets', args.budgetId);
 
     return args.budgetId;
   },
@@ -238,14 +239,14 @@ export const getTotalBudgetSummary = query({
     }
 
     type BudgetProgressResult = {
-      budgeted: Array<{
+      budgeted: {
         amount: number;
         spent: number;
         status: string;
-      }>;
-      unbudgeted: Array<{
+      }[];
+      unbudgeted: {
         spent: number;
-      }>;
+      }[];
     };
 
     // Get budget progress which already includes spending data
