@@ -1,6 +1,5 @@
 import createMDX from '@next/mdx';
 import type { NextConfig } from 'next';
-import remarkGfm from 'remark-gfm';
 
 /** @type {import('next').NextConfig} */
 const nextConfig: NextConfig = {
@@ -14,8 +13,8 @@ const withMDX = createMDX({
   // Add markdown plugins here, as desired
   options: {
     // Enable GitHub Flavored Markdown (tables, strikethrough, task lists, autolinks)
-    // Note: Plugin references need to be serializable for Turbopack compatibility
-    remarkPlugins: [remarkGfm],
+    // Note: Plugin names as strings for Turbopack compatibility (no require() calls)
+    remarkPlugins: ['remark-gfm'],
     rehypePlugins: [],
   },
 });
