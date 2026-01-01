@@ -1,5 +1,6 @@
 import createMDX from '@next/mdx';
 import type { NextConfig } from 'next';
+import path from 'path';
 
 /** @type {import('next').NextConfig} */
 const nextConfig: NextConfig = {
@@ -7,6 +8,12 @@ const nextConfig: NextConfig = {
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
   // Enable typed routes for compile-time type safety (moved from experimental in Next.js 16)
   typedRoutes: true,
+  // Fix Turbopack workspace root detection in monorepo
+  // Points to the monorepo root where pnpm-lock.yaml is located
+  // Use absolute path to ensure correct resolution
+  turbopack: {
+    root: path.resolve(__dirname, '../../'),
+  },
 };
 
 const withMDX = createMDX({

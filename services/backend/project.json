@@ -41,7 +41,8 @@
       "options": {
         "command": "pnpm typecheck",
         "cwd": "services/backend"
-      }
+      },
+      "outputs": ["{projectRoot}/dist"]
     }
   },
   "tags": []

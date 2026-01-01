@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "generate:icons": "bun run scripts/generate-icons.ts"
+    "generate:icons": "bun run scripts/generate-icons.ts",
+    "generate:icons:all": "bun run scripts/generate-icons.ts --favicon"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

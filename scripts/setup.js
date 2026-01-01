@@ -444,7 +444,7 @@ async function setupBranding(nonInteractive = false, brandingOptions = {}) {
     appName = brandingOptions.appName;
     appShortName =
       brandingOptions.appShortName || (appName.length > 15 ? appName.substring(0, 15) : appName);
-    appDescription = brandingOptions.appDescription || `${appName} - Built with Next.js and Convex`;
+    appDescription = brandingOptions.appDescription || appName;
     landingPageTitle = brandingOptions.landingPageTitle || appName;
     packageName =
       brandingOptions.packageName ||
@@ -472,10 +472,7 @@ async function setupBranding(nonInteractive = false, brandingOptions = {}) {
       appName.length > 15 ? appName.substring(0, 15) : appName
     );
 
-    appDescription = await promptUser(
-      'Application description',
-      `${appName} - Built with Next.js and Convex`
-    );
+    appDescription = await promptUser('Application description', appName);
 
     landingPageTitle = await promptUser('Landing page title', appName);
 
