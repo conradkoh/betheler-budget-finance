@@ -53,6 +53,66 @@ export const create = mutation({
   },
 });
 
+export const update = mutation({
+  args: {
+    ...SessionIdArg,
+    transactionId: v.id('transactions'),
+    amount: v.number(),
+    category: v.optional(v.string()),
+    datetime: v.string(),
+    description: v.string(),
+    transactionType: v.union(v.literal('expense'), v.literal('income'), v.literal('savings')),
+  },
+  handler: async (ctx, args) => {
+    // Ensure user is authenticated
+    const user = await getAuthUser(ctx, args);
+    if (!user) {
+      throw new Error('Unauthorized');
+    }
+
+    // Fetch the transaction to verify ownership
+    const transaction = await ctx.db.get('transactions', args.transactionId);
+
+    // Verify the transaction exists and belongs to the user
+    if (!transaction) {
+      throw new Error('Transaction not found');
+    }
+
+    if (transaction.userId !== user._id) {
+      throw new Error('Not authorized to update this transaction');
+    }
+
+    // For income, ensure amount is positive; for expenses, ensure amount is negative
+    // For savings, allow both positive (adding to savings) and negative (withdrawing from savings)
+    let adjustedAmount = args.amount;
+    if (args.transactionType === 'expense' && adjustedAmount > 0) {
+      adjustedAmount = -adjustedAmount; // Make expense amounts negative
+    } else if (args.transactionType === 'income' && adjustedAmount < 0) {
+      adjustedAmount = Math.abs(adjustedAmount); // Make income amounts positive
+    }
+    // Note: Savings amounts can be either positive (adding to savings) or negative (withdrawing from savings)
+
+    // Set default category based on transaction type
+    let category = args.category || '';
+    if (args.transactionType === 'income' && !category) {
+      category = 'Income';
+    } else if (args.transactionType === 'savings' && !category) {
+      category = 'Savings';
+    }
+
+    // Update the transaction
+    await ctx.db.patch('transactions', args.transactionId, {
+      amount: adjustedAmount,
+      category,
+      datetime: args.datetime,
+      description: args.description,
+      transactionType: args.transactionType,
+    });
+
+    return args.transactionId;
+  },
+});
+
 export const listForPastMonth = query({
   args: {
     ...SessionIdArg,

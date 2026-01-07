@@ -1,9 +1,9 @@
 import { api } from '@workspace/backend/convex/_generated/api';
+import type { Id } from '@workspace/backend/convex/_generated/dataModel';
 import { useSessionMutation } from 'convex-helpers/react/sessions';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { parseCurrencyInput } from '@/lib/formatCurrency';
-import { cn } from '@/lib/utils';
+
 import { CategorySelect } from './CategorySelect';
 import { DateTimePicker } from './DateTimePicker';
 import { type TransactionType, TransactionTypeSelect } from './TransactionTypeSelect';
@@ -20,11 +20,22 @@ import {
 import { Input } from './ui/input';
 import { NumberInput } from './ui/number-input';
 
+import { formatCurrency, parseCurrencyInput } from '@/lib/formatCurrency';
+import { cn } from '@/lib/utils';
+
 interface TransactionFormProps {
   onSuccess?: () => void;
   className?: string;
   initialType?: TransactionType;
   initialCategory?: string;
+  initialData?: {
+    _id?: Id<'transactions'>;
+    amount: number;
+    category?: string;
+    description: string;
+    datetime: string;
+    transactionType: TransactionType;
+  };
 }
 
 interface TransactionFormValues {
@@ -40,17 +51,23 @@ export function TransactionForm({
   className,
   initialType = 'expense',
   initialCategory = 'Food',
+  initialData,
 }: TransactionFormProps) {
   const createTransaction = useSessionMutation(api.transactions.create);
+  const updateTransaction = useSessionMutation(api.transactions.update);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isEditing = initialData?._id !== undefined;
 
   const form = useForm<TransactionFormValues>({
     defaultValues: {
-      amount: '',
-      category: initialCategory,
-      description: '',
-      datetime: new Date(),
-      transactionType: initialType,
+      amount: initialData
+        ? formatCurrency(Math.abs(initialData.amount), { showCurrency: false })
+        : '',
+      category: initialData?.category || initialCategory,
+      description: initialData?.description || '',
+      datetime: initialData ? new Date(initialData.datetime) : new Date(),
+      transactionType: initialData?.transactionType || initialType,
     },
   });
 
@@ -109,23 +126,36 @@ export function TransactionForm({
           category = 'Savings';
         }
 
-        await createTransaction({
-          amount,
-          category,
-          description: data.description,
-          datetime: data.datetime.toISOString(),
-          transactionType: data.transactionType,
-        });
+        if (isEditing && initialData?._id) {
+          // Update existing transaction
+          await updateTransaction({
+            transactionId: initialData._id,
+            amount,
+            category,
+            description: data.description,
+            datetime: data.datetime.toISOString(),
+            transactionType: data.transactionType,
+          });
+        } else {
+          // Create new transaction
+          await createTransaction({
+            amount,
+            category,
+            description: data.description,
+            datetime: data.datetime.toISOString(),
+            transactionType: data.transactionType,
+          });
+        }
 
         form.reset();
         onSuccess?.();
       } catch (error) {
-        console.error('Failed to create transaction:', error);
+        console.error(`Failed to ${isEditing ? 'update' : 'create'} transaction:`, error);
       } finally {
         setIsSubmitting(false);
       }
     },
-    [createTransaction, form, onSuccess]
+    [createTransaction, updateTransaction, form, onSuccess, isEditing, initialData]
   );
 
   return (
@@ -229,7 +259,13 @@ export function TransactionForm({
         />
 
         <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto mt-2">
-          {isSubmitting ? 'Adding...' : `Add ${transactionType}`}
+          {isSubmitting
+            ? isEditing
+              ? 'Updating...'
+              : 'Adding...'
+            : isEditing
+              ? 'Update Transaction'
+              : `Add ${transactionType}`}
         </Button>
       </form>
     </Form>
