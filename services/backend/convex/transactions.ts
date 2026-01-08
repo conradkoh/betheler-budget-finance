@@ -64,7 +64,7 @@ export const update = mutation({
     transactionType: v.union(v.literal('expense'), v.literal('income'), v.literal('savings')),
   },
   handler: async (ctx, args) => {
-    // Ensure user is authenticated
+    // ensure user is authenticated
     const user = await getAuthUser(ctx, args);
     if (!user) {
       throw new Error('Unauthorized');
