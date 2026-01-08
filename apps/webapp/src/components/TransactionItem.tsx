@@ -4,13 +4,16 @@ import { api } from '@workspace/backend/convex/_generated/api';
 import type { Doc } from '@workspace/backend/convex/_generated/dataModel';
 import { useSessionMutation } from 'convex-helpers/react/sessions';
 import { format } from 'date-fns';
-import { ArrowDownLeft, ArrowUpRight, PiggyBank, Trash2 } from 'lucide-react';
+import { ArrowDownLeft, ArrowUpRight, Edit2Icon, PiggyBank, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { formatCurrency } from '@/lib/formatCurrency';
-import { cn } from '@/lib/utils';
+
+import { TransactionForm } from './TransactionForm';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
+
+import { formatCurrency } from '@/lib/formatCurrency';
+import { cn } from '@/lib/utils';
 
 interface TransactionItemProps {
   transaction: Doc<'transactions'>;
@@ -20,6 +23,7 @@ interface TransactionItemProps {
 export function TransactionItem({ transaction, onDelete }: TransactionItemProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const deleteTransaction = useSessionMutation(api.transactions.remove);
 
   const handleDelete = async () => {
@@ -33,6 +37,11 @@ export function TransactionItem({ transaction, onDelete }: TransactionItemProps)
       setIsDeleting(false);
       setDeleteDialogOpen(false);
     }
+  };
+
+  const handleEditSuccess = () => {
+    setIsEditing(false);
+    onDelete?.(); // Refresh the list
   };
 
   const transactionDate = format(new Date(transaction.datetime), 'MMM d, yyyy');
@@ -101,22 +110,57 @@ export function TransactionItem({ transaction, onDelete }: TransactionItemProps)
                 {isIncome || (isSavings && transaction.amount > 0) ? '+' : '-'}
                 {formatCurrency(Math.abs(transaction.amount))}
               </p>
-              {onDelete && (
+              <div className="flex gap-1">
                 <Button
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8"
-                  onClick={() => setDeleteDialogOpen(true)}
+                  onClick={() => setIsEditing(true)}
                 >
-                  <Trash2 className="h-4 w-4" />
-                  <span className="sr-only">Delete</span>
+                  <Edit2Icon className="h-4 w-4" />
+                  <span className="sr-only">Edit</span>
                 </Button>
-              )}
+                {onDelete && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setDeleteDialogOpen(true)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">Delete</span>
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
+      {/* Edit dialog */}
+      <Dialog open={isEditing} onOpenChange={setIsEditing}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Edit Transaction</DialogTitle>
+            <DialogDescription>Update the details of your transaction</DialogDescription>
+          </DialogHeader>
+          <div className="mt-4">
+            <TransactionForm
+              initialData={{
+                _id: transaction._id,
+                amount: transaction.amount,
+                category: transaction.category,
+                description: transaction.description,
+                datetime: transaction.datetime,
+                transactionType: transaction.transactionType || 'expense',
+              }}
+              onSuccess={handleEditSuccess}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirmation dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
