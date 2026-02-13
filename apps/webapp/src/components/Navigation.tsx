@@ -41,18 +41,18 @@ export function Navigation() {
             {
               href: '/transactions',
               label: 'Transactions',
-              isActive: pathname.startsWith('/transactions'),
+              isActive: pathname?.startsWith('/transactions') ?? false,
             },
             {
               href: '/budgets',
               label: 'Budgets',
-              isActive: pathname.startsWith('/budgets'),
+              isActive: pathname?.startsWith('/budgets') ?? false,
             },
             // Leaderboard moved inside authenticated section for consistency
             {
               href: '/leaderboard',
               label: 'Leaderboard',
-              isActive: pathname.startsWith('/leaderboard'),
+              isActive: pathname?.startsWith('/leaderboard') ?? false,
             },
           ]
         : []),
