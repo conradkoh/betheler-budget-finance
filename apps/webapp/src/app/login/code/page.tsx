@@ -1,18 +1,16 @@
 'use client';
 
-import { Loader2 } from 'lucide-react';
+import { ChevronLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { useAuthState } from '@/modules/auth/AuthProvider';
 import { LoginWithCode } from '@/modules/auth/LoginWithCode';
 
 /**
  * Login code page that allows users to enter a code from another device for authentication.
- * Redirects authenticated users and provides a clean interface for code-based login.
+ * Design: Matches the main login page aesthetic with clean card-based layout.
  */
 export default function LoginCodePage() {
   const router = useRouter();
@@ -33,7 +31,7 @@ export default function LoginCodePage() {
 
   if (isLoading) {
     return (
-      <main className="flex items-center justify-center min-h-screen p-4">
+      <main className="flex min-h-screen flex-col items-center justify-center p-4 md:p-24">
         <div className="flex flex-col items-center gap-2">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <p className="text-sm text-muted-foreground">Loading...</p>
@@ -43,27 +41,32 @@ export default function LoginCodePage() {
   }
 
   return (
-    <main className="flex items-center justify-center min-h-screen p-4">
-      <Card className="w-full max-w-md p-6 space-y-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold tracking-tight">Login with Code</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Enter the code from your other device to access your account
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 md:p-24">
+      <div className="w-full max-w-md space-y-6">
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl font-bold">Enter Login Code</h1>
+          <p className="text-sm text-muted-foreground">
+            Use a temporary code from your other device
           </p>
         </div>
 
-        <div className="mt-6">
+        {/* Form Card */}
+        <div className="bg-card border border-border rounded-lg shadow-sm p-6">
           <LoginWithCode />
         </div>
 
-        <div className="mt-6 text-center">
-          <Link href="/login">
-            <Button variant="ghost" size="sm" aria-label="Return to login page">
-              Back to Login
-            </Button>
+        {/* Back Link */}
+        <div className="text-center">
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Back to login options
           </Link>
         </div>
-      </Card>
+      </div>
     </main>
   );
 }

@@ -62,7 +62,7 @@ touch src/content/intro.mdx
 
 #### Option A: Full Page Template (with layout)
 
-````mdx
+```mdx
 import MdxLayout from "../../../components/MdxLayout";
 
 export const metadata = {
@@ -81,12 +81,11 @@ You can use all standard markdown features:
 - Lists
 - Links to [other pages](/docs)
 - Code blocks
-
-```javascript
-const example = "syntax highlighting works";
-console.log(example);
+  \`\`\`javascript
+  const example = "syntax highlighting works";
+  console.log(example);
+  \`\`\`
 ```
-````
 
 > Blockquotes for important information
 
@@ -98,11 +97,9 @@ export default function MDXPage({ children }) {
 return <MdxLayout>{children}</MdxLayout>
 }
 
-````
-
+```mdx
 #### Option B: Component Template (no layout)
 
-```mdx
 # Reusable Content
 
 This content can be **imported and used** anywhere in your app.
@@ -113,10 +110,10 @@ This content can be **imported and used** anywhere in your app.
 - Inherits parent styling
 - Can be embedded in any component
 
-```javascript
+\`\`\`javascript
 // Works great for documentation snippets
 const example = "embedded content";
-```
+\`\`\`
 
 > Perfect for reusable content blocks!
 ```
@@ -125,8 +122,8 @@ const example = "embedded content";
 
 ```tsx
 // Import MDX as a component
-import IntroContent from '../content/intro.mdx';
-import FeaturesContent from '../content/features.mdx';
+import IntroContent from "../content/intro.mdx";
+import FeaturesContent from "../content/features.mdx";
 
 export default function MyPage() {
   return (
@@ -142,9 +139,7 @@ export default function MyPage() {
         <div className="prose prose-sm">
           <FeaturesContent />
         </div>
-        <div>
-          {/* Other React content */}
-        </div>
+        <div>{/* Other React content */}</div>
       </div>
     </div>
   );
@@ -154,9 +149,12 @@ export default function MyPage() {
 ### 4. Key Components Explained
 
 #### Import the Layout
+
 ```mdx
-import MdxLayout from '../../../components/MdxLayout'
-````
+import MdxLayout from '../../../components/MdxLayout
+
+'
+```
 
 - Adjust the path based on your file's location relative to `src/components/`
 - From `src/app/docs/page.mdx`: `'../../components/MdxLayout'`

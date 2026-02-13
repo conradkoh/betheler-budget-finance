@@ -50,7 +50,7 @@ For each file, work through the 6 cleanup steps below until all files are comple
 
 **Public Functions:**
 
-````typescript
+```typescript
 /**
  * Creates a new user account with the provided information.
  * Validates the email format and checks for duplicate accounts before creation.
@@ -62,18 +62,16 @@ For each file, work through the 6 cleanup steps below until all files are comple
  * @throws {DuplicateUserError} When user with email already exists
  *
  * @example
- * ```typescript
  * const userId = await createUser({
  *   email: 'user@example.com',
  *   name: 'John Doe',
  *   role: 'user'
  * });
- * ```
  */
 export async function createUser(userData: CreateUserRequest): Promise<string> {
   // Implementation
 }
-````
+```
 
 **Internal Functions:**
 
@@ -105,7 +103,7 @@ function formatDisplayName(firstName: string, lastName: string): string {
 
 **Interfaces & Types:**
 
-````typescript
+```typescript
 /**
  * Configuration for user profile display and editing capabilities.
  * Controls rendering behavior and interaction handling in the UserProfile component.
@@ -113,14 +111,12 @@ function formatDisplayName(firstName: string, lastName: string): string {
  * @public
  *
  * @example
- * ```typescript
  * const props: UserProfileProps = {
  *   userId: '123',
  *   editable: true,
  *   onSave: (data) => console.log('Saved:', data),
  *   onError: (error) => console.error('Error:', error)
  * };
- * ```
  */
 export interface UserProfileProps {
   /** Unique identifier of the user to display */
@@ -161,7 +157,7 @@ interface UserFormState {
   /** Whether the form has unsaved changes */
   isDirty: boolean;
 }
-````
+```
 
 **Constants:**
 
@@ -413,7 +409,7 @@ interface UserFormProps {
 
 ### After Cleanup (Following All 5 Steps)
 
-````typescript
+```typescript
 import React, { useCallback, useState } from "react";
 
 /**
@@ -423,12 +419,10 @@ import React, { useCallback, useState } from "react";
  * @public
  *
  * @example
- * ```typescript
  * <UserForm
  *   onSubmit={(data) => console.log('Form submitted:', data)}
  *   onError={(error) => console.error('Validation failed:', error)}
  * />
- * ```
  */
 export interface UserFormProps {
   /** Callback fired when the form is successfully submitted with valid data */
@@ -504,7 +498,7 @@ export function UserForm({ onSubmit, onError }: UserFormProps) {
 function validateEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
-````
+```
 
 ## Usage Instructions
 

@@ -4,14 +4,7 @@ import { SessionIdArg } from 'convex-helpers/server/sessions';
 import { featureFlags } from '../config/featureFlags';
 import { api, internal } from './_generated/api';
 import type { Doc, Id } from './_generated/dataModel';
-import {
-  type ActionCtx,
-  action,
-  internalMutation,
-  internalQuery,
-  mutation,
-  query,
-} from './_generated/server';
+import { action, internalMutation, internalQuery, mutation, query } from './_generated/server';
 import { getAccessLevel, isSystemAdmin } from '../modules/auth/accessControl';
 import { generateLoginCode, getCodeExpirationTime, isCodeExpired } from '../modules/auth/codeUtils';
 import type { AuthState } from '../modules/auth/types/AuthState';
@@ -456,8 +449,8 @@ export const checkCodeValidity = query({
 export const getOrCreateRecoveryCode = action({
   args: { ...SessionIdArg },
   handler: async (
-    ctx: ActionCtx,
-    args: { sessionId: string }
+    ctx,
+    args
   ): Promise<{ success: boolean; recoveryCode?: string; reason?: string }> => {
     // Check if login is disabled
     if (featureFlags.disableLogin) {
@@ -507,8 +500,8 @@ export const getOrCreateRecoveryCode = action({
 export const verifyRecoveryCode = action({
   args: { recoveryCode: v.string(), ...SessionIdArg },
   handler: async (
-    ctx: ActionCtx,
-    args: { recoveryCode: string; sessionId: string }
+    ctx,
+    args
   ): Promise<{ success: boolean; user?: Doc<'users'>; reason?: string }> => {
     // Check if login is disabled
     if (featureFlags.disableLogin) {
@@ -565,8 +558,8 @@ export const verifyRecoveryCode = action({
 export const regenerateRecoveryCode = action({
   args: { ...SessionIdArg },
   handler: async (
-    ctx: ActionCtx,
-    args: { sessionId: string }
+    ctx,
+    args
   ): Promise<{ success: boolean; recoveryCode?: string; reason?: string }> => {
     // Check if login is disabled
     if (featureFlags.disableLogin) {
@@ -609,7 +602,7 @@ export const regenerateRecoveryCode = action({
  * Internal query to retrieve a session by its sessionId.
  */
 export const getSessionBySessionId = internalQuery({
-  args: { sessionId: v.string() },
+  args: { ...SessionIdArg },
   handler: async (ctx, args): Promise<Doc<'sessions'> | null> => {
     return await ctx.db
       .query('sessions')
@@ -656,7 +649,7 @@ export const updateUserRecoveryCode = internalMutation({
  */
 export const createSession = internalMutation({
   args: {
-    sessionId: v.string(),
+    ...SessionIdArg,
     userId: v.id('users'),
     createdAt: v.number(),
     authMethod: v.optional(

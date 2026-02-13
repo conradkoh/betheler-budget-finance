@@ -62,13 +62,11 @@ For each file, work through the 6 cleanup steps below until all files are comple
  * @throws {DuplicateUserError} When user with email already exists
  *
  * @example
- * ```typescript
  * const userId = await createUser({
  *   email: 'user@example.com',
  *   name: 'John Doe',
  *   role: 'user'
  * });
- * ```
  */
 export async function createUser(userData: CreateUserRequest): Promise<string> {
   // Implementation
@@ -105,7 +103,7 @@ function formatDisplayName(firstName: string, lastName: string): string {
 
 **Interfaces & Types:**
 
-````typescript
+```typescript
 /**
  * Configuration for user profile display and editing capabilities.
  * Controls rendering behavior and interaction handling in the UserProfile component.
@@ -113,25 +111,23 @@ function formatDisplayName(firstName: string, lastName: string): string {
  * @public
  *
  * @example
- * ```typescript
  * const props: UserProfileProps = {
  *   userId: '123',
  *   editable: true,
  *   onSave: (data) => console.log('Saved:', data),
  *   onError: (error) => console.error('Error:', error)
  * };
- * ```
  */
 export interface UserProfileProps {
   /** Unique identifier of the user to display */
   userId: string;
-  
+
   /** Whether the profile can be edited by the current user. Defaults to false. */
   editable?: boolean;
-  
+
   /** Callback fired when profile data is successfully saved */
   onSave?: (data: UserData) => void;
-  
+
   /** Callback fired when an error occurs during save operation */
   onError?: (error: Error) => void;
 }
@@ -154,14 +150,14 @@ export type UserRole = "admin" | "user" | "guest";
 interface UserFormState {
   /** Whether the form is currently submitting */
   isSubmitting: boolean;
-  
+
   /** Current form validation errors */
   errors: Record<string, string>;
-  
+
   /** Whether the form has unsaved changes */
   isDirty: boolean;
 }
-````
+```
 
 **Constants:**
 
@@ -275,7 +271,7 @@ export function UserProfile({ userId, editable }: UserProfileProps) {
     isSubmitting: false,
     errors: {},
   });
-  
+
   // Implementation
 }
 
@@ -283,9 +279,7 @@ export function UserProfile({ userId, editable }: UserProfileProps) {
  * Creates a new user account with the provided information.
  * @public
  */
-export async function createUser(
-  userData: CreateUserRequest
-): Promise<string> {
+export async function createUser(userData: CreateUserRequest): Promise<string> {
   const validation = validateUserData(userData);
   if (!validation.isValid) {
     throw new Error(validation.errors.join(", "));
@@ -299,11 +293,11 @@ export async function createUser(
  */
 function validateUserData(userData: CreateUserRequest): ValidationResult {
   const errors: string[] = [];
-  
+
   if (!validateEmail(userData.email)) {
     errors.push("Invalid email format");
   }
-  
+
   return {
     isValid: errors.length === 0,
     errors,
@@ -415,7 +409,7 @@ interface UserFormProps {
 
 ### After Cleanup (Following All 5 Steps)
 
-````typescript
+```typescript
 import React, { useCallback, useState } from "react";
 
 /**
@@ -425,17 +419,15 @@ import React, { useCallback, useState } from "react";
  * @public
  *
  * @example
- * ```typescript
  * <UserForm
  *   onSubmit={(data) => console.log('Form submitted:', data)}
  *   onError={(error) => console.error('Validation failed:', error)}
  * />
- * ```
  */
 export interface UserFormProps {
   /** Callback fired when the form is successfully submitted with valid data */
   onSubmit: (data: FormData) => void;
-  
+
   /** Callback fired when form validation fails */
   onError?: (error: Error) => void;
 }
@@ -449,7 +441,7 @@ export interface UserFormProps {
 interface FormData {
   /** User's email address (must be valid format) */
   email: string;
-  
+
   /** User's full name */
   name: string;
 }
@@ -465,7 +457,7 @@ interface FormData {
  */
 export function UserForm({ onSubmit, onError }: UserFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const handleSubmit = useCallback(
     (data: FormData) => {
       if (!validateEmail(data.email)) {
@@ -473,7 +465,7 @@ export function UserForm({ onSubmit, onError }: UserFormProps) {
         onError?.(error);
         return;
       }
-      
+
       setIsSubmitting(true);
       try {
         onSubmit(data);
@@ -506,7 +498,7 @@ export function UserForm({ onSubmit, onError }: UserFormProps) {
 function validateEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
-````
+```
 
 ## Usage Instructions
 
@@ -525,6 +517,7 @@ This systematic approach ensures no files are missed and all code meets consiste
 ## RFC 2119 Key Words
 
 This document uses RFC 2119 terminology:
+
 - **MUST** / **MUST NOT**: Absolute requirement
 - **SHOULD** / **SHOULD NOT**: Recommended but not required
 - **MAY**: Optional

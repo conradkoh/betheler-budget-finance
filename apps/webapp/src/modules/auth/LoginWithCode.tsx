@@ -4,7 +4,7 @@ import { api } from '@workspace/backend/convex/_generated/api';
 import { useSessionMutation } from 'convex-helpers/react/sessions';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -12,17 +12,27 @@ import { Input } from '@/components/ui/input';
 
 /**
  * Displays login form for users to authenticate using temporary login codes.
+ *
+ * Design: Minimal and clean, matching the main login page aesthetic.
+ * The input uses monospace font with centered text for code entry.
  */
 export function LoginWithCode() {
   const router = useRouter();
   const verifyLoginCode = useSessionMutation(api.auth.verifyLoginCode);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Auto-focus input on mount for immediate code entry
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
   // Event handlers
   const handleCodeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setError(null); // Clear error when user starts typing
     _handleCodeChange(e, setCode);
   }, []);
 
@@ -48,55 +58,48 @@ export function LoginWithCode() {
         <span>Verifying...</span>
       </>
     ) : (
-      'Login'
+      'Continue'
     );
   }, [isLoading]);
 
-  const formContent = useMemo(
-    () => (
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <Input
-            type="text"
-            placeholder="XXXX-XXXX"
-            value={code}
-            onChange={handleCodeChange}
-            className="text-center font-mono text-lg tracking-wider"
-            maxLength={9} // 8 characters + 1 dash
-            autoComplete="off"
-            disabled={isLoading}
-            aria-label="Enter login code"
-            aria-describedby={error ? 'code-error' : undefined}
-            aria-invalid={error ? true : undefined}
-          />
-          {error && (
-            <p id="code-error" className="mt-1 text-sm text-destructive" role="alert">
-              {error}
-            </p>
-          )}
-        </div>
-
-        <Button type="submit" className="w-full" disabled={isLoading} aria-busy={isLoading}>
-          {buttonContent}
-        </Button>
-      </form>
-    ),
-    [code, error, isLoading, handleCodeChange, handleSubmit, buttonContent]
-  );
-
   return (
-    <div className="space-y-4">
-      <div className="text-center mb-6">
-        <h3 className="text-lg font-semibold">Login with Code</h3>
-        <p className="text-sm text-muted-foreground">Enter the login code from your other device</p>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Input
+          ref={inputRef}
+          id="login-code"
+          type="text"
+          placeholder="XXXX-XXXX"
+          value={code}
+          onChange={handleCodeChange}
+          className="text-center font-mono text-lg tracking-widest"
+          maxLength={9} // 8 characters + 1 dash
+          autoComplete="off"
+          disabled={isLoading}
+          aria-label="Enter login code"
+          aria-describedby={error ? 'code-error' : 'code-hint'}
+          aria-invalid={error ? true : undefined}
+        />
+        {error ? (
+          <p id="code-error" className="text-sm text-destructive text-center" role="alert">
+            {error}
+          </p>
+        ) : (
+          <p id="code-hint" className="text-xs text-muted-foreground text-center">
+            Enter the 8-character code from your other device
+          </p>
+        )}
       </div>
 
-      {formContent}
+      <Button type="submit" className="w-full" disabled={isLoading} aria-busy={isLoading}>
+        {buttonContent}
+      </Button>
 
-      <p className="text-xs text-muted-foreground text-center">
-        The login code is case-insensitive and valid for 1 minute after generation
-      </p>
-    </div>
+      <div className="pt-2 space-y-1 text-xs text-muted-foreground text-center">
+        <p>Generate a code from your Profile settings on your logged-in device.</p>
+        <p>Codes are case-insensitive and valid for 1 minute.</p>
+      </div>
+    </form>
   );
 }
 
@@ -137,9 +140,15 @@ async function _handleSubmit(params: _HandleSubmitParams): Promise<void> {
   e.preventDefault();
 
   // Validate code format
-  const cleanCode = code.replace(/-/g, '');
+  const cleanCode = code.replace(/-/g, '').trim();
+  if (cleanCode.length === 0) {
+    setError('Please enter your login code');
+    return;
+  }
   if (cleanCode.length !== 8) {
-    setError('Please enter a valid 8-character login code');
+    setError(
+      `Code must be 8 characters. You entered ${cleanCode.length} character${cleanCode.length !== 1 ? 's' : ''}.`
+    );
     return;
   }
 

@@ -536,7 +536,7 @@ export const disconnectGoogle = mutation({
  */
 export const createLoginRequest = mutation({
   args: {
-    sessionId: v.string(),
+    ...SessionIdArg,
     redirectUri: v.string(),
   },
   handler: async (ctx, args) => {
@@ -564,7 +564,7 @@ export const createLoginRequest = mutation({
  */
 export const createConnectRequest = mutation({
   args: {
-    sessionId: v.string(),
+    ...SessionIdArg,
     redirectUri: v.string(),
   },
   handler: async (ctx, args) => {

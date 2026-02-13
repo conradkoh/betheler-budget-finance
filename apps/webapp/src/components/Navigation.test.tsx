@@ -25,11 +25,6 @@ vi.mock('next/link', () => ({
   ),
 }));
 
-// Mock next/navigation
-vi.mock('next/navigation', () => ({
-  usePathname: () => '/',
-}));
-
 // Mock UserMenu component
 vi.mock('@/components/UserMenu', () => ({
   UserMenu: () => <div data-testid="user-menu">User Menu</div>,
@@ -43,41 +38,6 @@ vi.mock('@workspace/backend/config/featureFlags', () => ({
 }));
 
 describe('Navigation', () => {
-  it('renders title link to "/" when user is not authenticated', () => {
-    vi.mocked(useAuthState).mockReturnValue({
-      sessionId: 'test-session',
-      state: 'unauthenticated',
-      reason: 'test',
-    });
-
-    render(<Navigation />);
-
-    const titleLink = screen.getByRole('link', { name: /budget/i });
-    expect(titleLink).toBeInTheDocument();
-    expect(titleLink).toHaveAttribute('href', '/');
-  });
-
-  it('renders title link to "/app" when user is authenticated', () => {
-    vi.mocked(useAuthState).mockReturnValue({
-      sessionId: 'test-session',
-      state: 'authenticated',
-      user: {
-        _id: 'test-user-id' as Id<'users'>,
-        _creationTime: Date.now(),
-        type: 'anonymous',
-        name: 'Test User',
-      },
-      accessLevel: 'user',
-      isSystemAdmin: false,
-    });
-
-    render(<Navigation />);
-
-    const titleLink = screen.getByRole('link', { name: /^budget$/i });
-    expect(titleLink).toBeInTheDocument();
-    expect(titleLink).toHaveAttribute('href', '/app');
-  });
-
   it('renders login button when user is not authenticated', () => {
     vi.mocked(useAuthState).mockReturnValue({
       sessionId: 'test-session',

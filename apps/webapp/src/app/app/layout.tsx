@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { Suspense } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2 } from 'lucide-react';
+import { Suspense } from 'react';
 
-import { AuthErrorBoundary } from "@/modules/auth/AuthErrorBoundary";
-import { RequireLogin } from "@/modules/auth/RequireLogin";
+import { AuthErrorBoundary } from '@/modules/auth/AuthErrorBoundary';
+import { RequireLogin } from '@/modules/auth/RequireLogin';
 
 /**
  * Loading fallback for Suspense boundary.
