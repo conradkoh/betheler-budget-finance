@@ -1,0 +1,189 @@
+# FixedSizeDialog
+
+A production-grade dialog component with fixed sizing, scrollable content areas, and optional sidebar support.
+
+## Features
+
+- **Fixed large size on desktop** (1200px max-width), fullscreen on mobile
+- **Fixed header and footer** - Title and actions stay visible while content scrolls
+- **Scrollable content area** - Independently scrollable main content
+- **Optional sidebar support** - Sidebar with title alignment to main dialog title
+- **Dark mode compatible** - Uses semantic color tokens
+- **Composition-based API** - Flexible, declarative usage
+
+## Installation
+
+The component is located at `apps/webapp/src/components/ui/fixed-size-dialog.tsx`. It's part of the UI components and should be automatically available.
+
+## Usage
+
+### Basic Dialog
+
+```tsx
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import {
+  FixedSizeDialog,
+  FixedSizeDialogActions,
+  FixedSizeDialogContent,
+  FixedSizeDialogTitle,
+} from '@/components/ui/fixed-size-dialog';
+import { Button } from '@/components/ui/button';
+
+export default function Example() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Open Dialog</Button>
+      </DialogTrigger>
+      <FixedSizeDialog>
+        <FixedSizeDialogTitle>Dialog Title</FixedSizeDialogTitle>
+        <FixedSizeDialogContent>
+          <p>Your content here...</p>
+        </FixedSizeDialogContent>
+        <FixedSizeDialogActions>
+          <Button variant="outline">Cancel</Button>
+          <Button>Save</Button>
+        </FixedSizeDialogActions>
+      </FixedSizeDialog>
+    </Dialog>
+  );
+}
+```
+
+### With Description
+
+```tsx
+<FixedSizeDialog>
+  <FixedSizeDialogTitle>User Settings</FixedSizeDialogTitle>
+  <FixedSizeDialogDescription>
+    Update your profile information and preferences.
+  </FixedSizeDialogDescription>
+  <FixedSizeDialogContent>
+    <p>Your form fields here...</p>
+  </FixedSizeDialogContent>
+  <FixedSizeDialogActions>
+    <Button>Save</Button>
+  </FixedSizeDialogActions>
+</FixedSizeDialog>
+```
+
+### With Sidebar
+
+```tsx
+<FixedSizeDialog>
+  <FixedSizeDialogTitle>Settings</FixedSizeDialogTitle>
+  <FixedSizeDialogSidebar title="Navigation" widthClassName="w-full sm:w-64">
+    <nav>
+      <button>General</button>
+      <button>Security</button>
+    </nav>
+  </FixedSizeDialogSidebar>
+  <FixedSizeDialogContent>
+    <p>Main content here...</p>
+  </FixedSizeDialogContent>
+  <FixedSizeDialogActions>
+    <Button>Save</Button>
+  </FixedSizeDialogActions>
+</FixedSizeDialog>
+```
+
+## Component API
+
+### FixedSizeDialog
+
+Root component that wraps the dialog content with fixed sizing.
+
+```tsx
+interface FixedSizeDialogProps extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
+  /** Whether to show the close button in the top-right corner. Default: true */
+  showCloseButton?: boolean;
+}
+```
+
+### FixedSizeDialogTitle
+
+Fixed header section that stays at the top of the dialog. Uses `shrink-0` to prevent shrinking in the flex layout.
+
+### FixedSizeDialogDescription
+
+Optional description for accessibility (WCAG compliance). Appears between title and content.
+
+### FixedSizeDialogContent
+
+Scrollable main content area. Uses `flex-1` to fill available space between title and actions.
+
+### FixedSizeDialogSidebar
+
+Optional sidebar component. Features:
+- Customizable width via `widthClassName` prop (default: `w-full sm:w-64`)
+- Optional title that aligns with main dialog title
+- Independently scrollable content
+
+```tsx
+interface FixedSizeDialogSidebarProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
+  /** Optional title for the sidebar that aligns with the main dialog title */
+  title?: React.ReactNode;
+  /** Custom width classes. Default: 'w-full sm:w-64' */
+  widthClassName?: string;
+}
+```
+
+### FixedSizeDialogActions
+
+Fixed footer section for action buttons. Stays at the bottom while content scrolls.
+
+## Important Notes
+
+### Layout Structure
+
+The component uses a flexbox layout with three main sections:
+1. **Header** - Fixed at top (FixedSizeDialogTitle)
+2. **Content** - Fills remaining space (FixedSizeDialogContent)
+3. **Footer** - Fixed at bottom (FixedSizeDialogActions)
+
+For the sidebar layout, place FixedSizeDialogSidebar and FixedSizeDialogContent as **direct children** of FixedSizeDialog - do NOT wrap them in an extra div:
+
+```tsx
+// ✅ CORRECT - Direct children
+<FixedSizeDialog>
+  <FixedSizeDialogTitle>Title</FixedSizeDialogTitle>
+  <FixedSizeDialogSidebar>...</FixedSizeDialogSidebar>
+  <FixedSizeDialogContent>...</FixedSizeDialogContent>
+  <FixedSizeDialogActions>...</FixedSizeDialogActions>
+</FixedSizeDialog>
+
+// ❌ WRONG - Extra wrapper breaks layout
+<FixedSizeDialog>
+  <FixedSizeDialogTitle>Title</FixedSizeDialogTitle>
+  <div className="flex"> {/* Don't add extra wrapper! */}
+    <FixedSizeDialogSidebar>...</FixedSizeDialogSidebar>
+    <FixedSizeDialogContent>...</FixedSizeDialogContent>
+  </div>
+  <FixedSizeDialogActions>...</FixedSizeDialogActions>
+</FixedSizeDialog>
+```
+
+### Closing the Dialog
+
+Use `onOpenChange` on the Dialog component to control open state:
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Dialog open={open} onOpenChange={setOpen}>
+  ...
+</Dialog>
+```
+
+Or use the close button in actions:
+
+```tsx
+<FixedSizeDialogActions>
+  <Button onClick={() => setOpen(false)}>Cancel</Button>
+</FixedSizeDialogActions>
+```
+
+## Related Components
+
+- [Dialog](dialog.tsx) - Standard Radix UI dialog (centered, smaller)
+- [FullscreenDialogContent](dialog.tsx) - Fullscreen variant for mobile-optimized UIs

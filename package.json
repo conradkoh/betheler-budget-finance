@@ -2,41 +2,41 @@
   "name": "betheler-budget-finance",
   "version": "1.0.0",
   "description": "",
+  "packageManager": "pnpm@10.15.1",
   "main": "index.js",
   "scripts": {
-    "test": "nx run-many --target=test --projects=@workspace/webapp,@workspace/backend",
-    "test:watch": "nx run-many --target=test:watch --projects=@workspace/webapp,@workspace/backend",
-    "dev": "nx run @workspace/webapp:dev",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch",
+    "dev": "turbo run dev",
     "setup": "node scripts/setup.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "biome format .",
-    "format:fix": "biome format --write .",
-    "typecheck": "nx run-many --target=typecheck --projects=@workspace/webapp,@workspace/backend",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "typecheck": "turbo run typecheck",
     "prepare": "husky"
   },
   "lint-staged": {
     "**/*.{ts,tsx,js,jsx}": [
       "eslint --fix",
-      "biome format --write --no-errors-on-unmatched"
+      "prettier --write"
     ],
-    "**/*.{json,md}": [
-      "biome format --write --no-errors-on-unmatched"
+    "**/*.{json,md,css,scss}": [
+      "prettier --write"
     ]
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@biomejs/biome": "2.1.2",
     "@convex-dev/eslint-plugin": "^1.1.1",
     "@eslint/eslintrc": "^3",
-    "@nx/workspace": "22.5.0",
     "@types/node": "^20.17.24",
     "@typescript-eslint/eslint-plugin": "^8.49.0",
     "@typescript-eslint/parser": "^8.49.0",
     "eslint": "^9.26.0",
     "eslint-config-next": "16.1.1",
+    "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsdoc": "^61.5.0",
     "eslint-plugin-react": "^7.37.5",
@@ -44,7 +44,8 @@
     "globals": "^16.5.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.0",
-    "nx": "22.5.0",
+    "prettier": "^3.5.0",
+    "turbo": "^2.4.4",
     "typescript": "^5.9.3"
   },
   "dependencies": {
@@ -55,11 +56,10 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "@biomejs/biome",
       "bun",
       "esbuild",
-      "nx",
       "sharp",
+      "turbo",
       "unrs-resolver"
     ],
     "overrides": {

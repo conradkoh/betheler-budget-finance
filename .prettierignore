@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+.next
+.nx
+.convex
+.turbo
+.git
+coverage
+.pnpm-debug.log
