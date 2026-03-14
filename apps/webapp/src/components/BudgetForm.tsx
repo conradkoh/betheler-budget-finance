@@ -1,11 +1,13 @@
 import { api } from '@workspace/backend/convex/_generated/api';
 import type { Id } from '@workspace/backend/convex/_generated/dataModel';
 import { useSessionMutation, useSessionQuery } from 'convex-helpers/react/sessions';
-import { useCallback, useState } from 'react';
+import { InfoIcon } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { formatCurrency, parseCurrencyInput } from '@/lib/formatCurrency';
+
 import { CategorySelect } from './CategorySelect';
+import { Alert, AlertDescription } from './ui/alert';
 import { Button } from './ui/button';
 import {
   Form,
@@ -16,8 +18,9 @@ import {
   FormLabel,
   FormMessage,
 } from './ui/form';
-
 import { NumberInput } from './ui/number-input';
+
+import { formatCurrency, parseCurrencyInput } from '@/lib/formatCurrency';
 
 interface BudgetFormProps {
   onSuccess?: () => void;
@@ -39,7 +42,10 @@ interface BudgetFormValues {
 export function BudgetForm({ onSuccess, className, year, month, initialData }: BudgetFormProps) {
   const createBudget = useSessionMutation(api.budgets.create);
   const updateBudget = useSessionMutation(api.budgets.update);
+  const addToBudget = useSessionMutation(api.budgets.addToBudget);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAddToExisting, setShowAddToExisting] = useState(false);
+  const [existingBudgetAmount, setExistingBudgetAmount] = useState<number | null>(null);
 
   // Get existing budgets to check for duplicates
   const existingBudgets = useSessionQuery(api.budgets.listByMonth, {
@@ -53,6 +59,38 @@ export function BudgetForm({ onSuccess, className, year, month, initialData }: B
       category: initialData?.category || 'Food',
     },
   });
+
+  // Check for existing budget on initial load
+  useEffect(() => {
+    if (!initialData && existingBudgets) {
+      const currentCategory = form.getValues().category;
+      const existingBudget = existingBudgets?.find((budget) => budget.category === currentCategory);
+
+      if (existingBudget) {
+        setExistingBudgetAmount(existingBudget.amount);
+        setShowAddToExisting(true);
+      }
+    }
+  }, [existingBudgets, initialData, form]);
+
+  // Reset add to existing state when category changes
+  const handleCategoryChange = useCallback(
+    (newCategory: string) => {
+      setShowAddToExisting(false);
+      setExistingBudgetAmount(null);
+      form.clearErrors('category');
+      form.setValue('category', newCategory);
+
+      // Check if this category already has a budget and show the message immediately
+      const existingBudget = existingBudgets?.find((budget) => budget.category === newCategory);
+
+      if (existingBudget && !initialData) {
+        setExistingBudgetAmount(existingBudget.amount);
+        setShowAddToExisting(true);
+      }
+    },
+    [form, existingBudgets, initialData]
+  );
 
   const onSubmit = useCallback(
     async (data: BudgetFormValues) => {
@@ -90,23 +128,47 @@ export function BudgetForm({ onSuccess, className, year, month, initialData }: B
           );
 
           if (existingBudget) {
-            // Show error message with toast
-            form.setError('category', {
-              message: 'A budget for this category already exists in this month',
-            });
-            toast.error(
-              `Budget for ${data.category} already exists. Please update the existing budget instead.`
-            );
-            return;
-          }
+            if (showAddToExisting) {
+              // Add to existing budget - double check it still exists
+              const currentExistingBudget = existingBudgets?.find(
+                (budget) => budget.category === data.category
+              );
 
-          // Create new budget
-          await createBudget({
-            category: data.category,
-            amount,
-            year,
-            month,
-          });
+              if (!currentExistingBudget) {
+                // Budget was removed, create new one instead
+                await createBudget({
+                  category: data.category,
+                  amount,
+                  year,
+                  month,
+                });
+              } else {
+                // Add to existing budget
+                await addToBudget({
+                  category: data.category,
+                  amount,
+                  year,
+                  month,
+                });
+                toast.success(
+                  `Added ${formatCurrency(amount)} to ${data.category} budget. New total: ${formatCurrency(currentExistingBudget.amount + amount)}`
+                );
+              }
+            } else {
+              // Show option to add to existing budget
+              setExistingBudgetAmount(existingBudget.amount);
+              setShowAddToExisting(true);
+              return;
+            }
+          } else {
+            // Create new budget
+            await createBudget({
+              category: data.category,
+              amount,
+              year,
+              month,
+            });
+          }
         }
 
         toast.success(
@@ -133,7 +195,20 @@ export function BudgetForm({ onSuccess, className, year, month, initialData }: B
         setIsSubmitting(false);
       }
     },
-    [createBudget, updateBudget, form, onSuccess, initialData, year, month, existingBudgets]
+    [
+      createBudget,
+      updateBudget,
+      addToBudget,
+      form,
+      onSuccess,
+      initialData,
+      year,
+      month,
+      existingBudgets,
+      showAddToExisting,
+      existingBudgetAmount,
+      handleCategoryChange,
+    ]
   );
 
   return (
@@ -149,7 +224,7 @@ export function BudgetForm({ onSuccess, className, year, month, initialData }: B
                 <FormControl>
                   <CategorySelect
                     value={field.value}
-                    onChange={field.onChange}
+                    onChange={handleCategoryChange}
                     className="w-full"
                     disabled={!!initialData}
                   />
@@ -158,6 +233,18 @@ export function BudgetForm({ onSuccess, className, year, month, initialData }: B
               </FormItem>
             )}
           />
+
+          {/* Add to Existing Budget Alert */}
+          {showAddToExisting && existingBudgetAmount !== null && (
+            <Alert className="bg-info-bg border-info/20">
+              <InfoIcon className="h-4 w-4 text-info" />
+              <AlertDescription className="text-xs">
+                A budget for {form.getValues().category} already exists (
+                {formatCurrency(existingBudgetAmount)}). This amount will be added to the existing
+                budget.
+              </AlertDescription>
+            </Alert>
+          )}
 
           <FormField
             control={form.control}
@@ -183,7 +270,13 @@ export function BudgetForm({ onSuccess, className, year, month, initialData }: B
           />
 
           <Button type="submit" disabled={isSubmitting} className="w-full">
-            {isSubmitting ? 'Saving...' : initialData ? 'Update Budget' : 'Add Budget'}
+            {isSubmitting
+              ? 'Saving...'
+              : initialData
+                ? 'Update Budget'
+                : showAddToExisting
+                  ? 'Add to Existing Budget'
+                  : 'Add Budget'}
           </Button>
         </div>
       </form>

@@ -286,6 +286,47 @@ export const getTotalBudgetSummary = query({
   },
 });
 
+// Add amount to an existing budget
+export const addToBudget = mutation({
+  args: {
+    ...SessionIdArg,
+    category: v.string(),
+    amount: v.number(),
+    year: v.number(),
+    month: v.number(), // 0-based (January is 0)
+  },
+  handler: async (ctx, args) => {
+    // Ensure user is authenticated
+    const user = await getAuthUser(ctx, args);
+    if (!user) {
+      throw new Error('Unauthorized');
+    }
+
+    // Find existing budget for this category, month, and year
+    const allBudgetsForMonth = await ctx.db
+      .query('budgets')
+      .withIndex('by_userId_yearMonth', (q) =>
+        q.eq('userId', user._id).eq('year', args.year).eq('month', args.month)
+      )
+      .collect();
+
+    const existingBudget = allBudgetsForMonth.find((budget) => budget.category === args.category);
+
+    if (!existingBudget) {
+      throw new Error('No existing budget found for this category in the specified month');
+    }
+
+    // Update the budget by adding the new amount
+    const newAmount = existingBudget.amount + args.amount;
+    await ctx.db.patch('budgets', existingBudget._id, {
+      amount: newAmount,
+      updatedAt: Date.now(),
+    });
+
+    return existingBudget._id;
+  },
+});
+
 // Copy budgets from one month to another
 export const copyBudgetsFromMonth = mutation({
   args: {
